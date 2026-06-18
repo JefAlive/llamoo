@@ -88,7 +88,7 @@ export function buildLlamaArgs(profile: LlamaProfile): string[] {
 
   // Attention
   if (profile.flashAttention) {
-    args.push("--flash-attn");
+    args.push("--flash-attn", "on");
   }
   if (profile.noMmap) {
     args.push("--no-mmap");

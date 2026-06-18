@@ -35,7 +35,7 @@ export function ProfilesScreen({
   onSyncModels,
 }: ProfilesScreenProps) {
   const { stdout } = useStdout();
-  const { maxContainerColumns, columns } = useResponsiveLayout();
+  const { isDesktop, maxContainerColumns } = useResponsiveLayout();
 
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [searching, setSearching] = useState(false);
@@ -143,16 +143,20 @@ export function ProfilesScreen({
   const visibleItems = filteredProfiles.slice(scrollOffset, scrollOffset + listHeight);
 
   return (
-    <Box flexDirection="column" flexGrow={1} alignItems="center">
-      <Box flexDirection="column" width={maxContainerColumns} alignItems="center">
+    <Box flexDirection="column" flexGrow={1} alignItems="center" backgroundColor={theme.bg}>
+      <Box flexDirection="column" width={maxContainerColumns} alignItems="center" justifyContent="space-around" paddingY={1} gap={1} flexGrow={1}>
         {/* Main content */}
-        <Logo theme={theme} />
+        <Box flexShrink={0}>
+          <Logo theme={theme} />
+        </Box>
 
-        <Box flexDirection="row" flexGrow={1} justifyContent="center" gap={2} paddingY={2}>
+        <Box flexDirection="row" justifyContent="center" alignItems="center" gap={2} flexShrink={1}>
           {/* Left: profile list */}
           <Box
             flexDirection="column"
-            width={Math.floor(maxContainerColumns * 0.6)}
+            width={Math.floor(maxContainerColumns * (isDesktop ? 0.6 : 0.5))}
+            height="100%"
+            justifyContent="center"
           >
             <Box gap={1}>
               <Text color={theme.accent} bold={!searching}>
@@ -227,9 +231,11 @@ export function ProfilesScreen({
           {/* Right: profile details */}
           <Box
             flexDirection="column"
-            width={Math.floor(maxContainerColumns * 0.4)}
+            width={Math.floor(maxContainerColumns * (isDesktop ? 0.4 : 0.5))}
+            height="100%"
             borderStyle="round"
             borderColor={theme.border}
+            borderBackgroundColor={theme.bg}
             paddingX={2}
             paddingY={1}
           >
@@ -261,6 +267,7 @@ export function ProfilesScreen({
                   gap={0}
                   borderStyle="round"
                   borderColor={theme.border}
+                  borderBackgroundColor={theme.bg}
                   borderTop={true}
                   borderRight={false}
                   borderBottom={false}
