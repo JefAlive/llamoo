@@ -35,7 +35,7 @@ export function HintBar({ theme, hints }: HintBarProps) {
     <Box flexShrink={0} paddingX={1} gap={2}>
       {hints.map(({ key, desc }, i) => (
         <Box key={i} gap={1}>
-          <Text color={theme.accent} bold>
+          <Text color={theme.fg} bold>
             {key}
           </Text>
           <Text color={theme.dim}>{desc}</Text>

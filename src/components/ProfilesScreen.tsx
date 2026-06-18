@@ -132,7 +132,7 @@ export function ProfilesScreen({
     : undefined;
 
   const modelName = useMemo(() => {
-    if (!selectedModel?.name) return '—';
+    if (!selected?.name) return '—';
 
     const modelFilename = selected.modelPath.split("/").pop() || '—';
     const modelName = modelFilename.replace(/.gguf$/gi, "")
@@ -156,27 +156,53 @@ export function ProfilesScreen({
             flexDirection="column"
             width={Math.floor(maxContainerColumns * (isDesktop ? 0.6 : 0.5))}
             height="100%"
-            justifyContent="center"
+            justifyContent="flex-start"
+            gap={1}
           >
-            <Box gap={1}>
-              <Text color={theme.accent} bold={!searching}>
-                {'> models'}
-              </Text>
-              <Text>
-                {models.length} {models.length === 1 ? "model" : "models"} detected
+            <Box flexShrink={0}>
+              <Text color={theme.dim} bold>
+                {'// models'}
               </Text>
             </Box>
 
             {models.length === 0 && (
-              <Box>
+              <Box
+                flexDirection="column"
+                paddingLeft={1}
+                borderStyle={{
+                  topLeft: '',
+                  top: '',
+                  topRight: '',
+                  left: '▌',
+                  bottomLeft: '',
+                  bottom: '',
+                  bottomRight: '',
+                  right: '▐',
+                }}
+                borderColor={theme.warning}
+                borderTop={false}
+                borderRight={false}
+                borderBottom={false}
+                borderBackgroundColor={theme.bg}
+                backgroundColor={theme.bg}
+              >
+                <Text color={theme.warning} bold>No models detected.</Text>
                 <Text color={theme.warning}>Press [d] to configure your model directory.</Text>
               </Box>
             )}
 
+            {models.length > 0 && (
+              <Box>
+                <Text color={theme.fg}>
+                  {`   ${models.length} ${models.length === 1 ? "model" : "models"} detected`}
+                </Text>
+              </Box>
+            )}
+
             {(models.length > 0 || profiles.length > 0) && (
-              <Box marginTop={1}>
-                <Text color={theme.accent} bold={!searching}>
-                  {'> profiles'}
+              <Box>
+                <Text color={theme.dim} bold>
+                  {'// profiles'}
                 </Text>
                 {(searching || searchQuery) && (
                   <>
@@ -200,20 +226,20 @@ export function ProfilesScreen({
             )}
 
             {profiles.length > 0 && filteredProfiles.length === 0 && (
-              <Box paddingY={1}>
+              <Box>
                 <Text color={theme.dim}>
                   No results for your search.
                 </Text>
               </Box>
             )}
 
-            <Box flexDirection="column" paddingY={1}>
+            <Box flexDirection="column">
               {visibleItems.map((profile, i) => {
                 const realIdx = i + scrollOffset;
                 const isSelected = realIdx === selectedIdx;
                 return (
-                  <Box key={profile.id} flexDirection="row" height={1}>
-                    <Text color={isSelected ? theme.accentAlt : undefined} bold={isSelected} wrap="truncate-middle">
+                  <Box key={profile.id} flexDirection="row" paddingX={3} height={1} backgroundColor={isSelected ? theme.accent : undefined}>
+                    <Text color={isSelected ? theme.bg : theme.fg} bold={isSelected} wrap="truncate-middle">
                       {profile.name}
                     </Text>
                   </Box>
@@ -225,7 +251,6 @@ export function ProfilesScreen({
                 </Text>
               )}
             </Box>
-                
           </Box>
 
           {/* Right: profile details */}
@@ -233,7 +258,7 @@ export function ProfilesScreen({
             flexDirection="column"
             width={Math.floor(maxContainerColumns * (isDesktop ? 0.4 : 0.5))}
             height="100%"
-            borderStyle="round"
+            borderStyle={profiles.length === 0 ? undefined : "round"}
             borderColor={theme.border}
             borderBackgroundColor={theme.bg}
             paddingX={2}
@@ -256,7 +281,7 @@ export function ProfilesScreen({
                     <Text color={theme.dim}>Size: </Text>
                   </Box>
                   <Box flexShrink={1}>
-                    <Text color={theme.accentAlt}>
+                    <Text color={theme.fg} bold>
                       {formatBytes(selectedModel?.sizeBytes || 0)}
                     </Text>
                   </Box>

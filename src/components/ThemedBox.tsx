@@ -10,6 +10,7 @@ interface ThemedBoxProps {
   appendText?: string;
   width?: string | number;
   height?: string | number;
+  maxHeight?: string | number;
   flexDirection?: "row" | "column";
   flexGrow?: number;
   paddingX?: number;
@@ -26,6 +27,7 @@ export function ThemedBox({
   appendText,
   width,
   height,
+  maxHeight,
   flexDirection = "column",
   flexGrow,
   paddingX = 1,
@@ -45,6 +47,7 @@ export function ThemedBox({
       flexDirection={flexDirection}
       width={width}
       height={height}
+      maxHeight={maxHeight}
       flexGrow={flexGrow}
       paddingX={paddingX}
       paddingY={paddingY}

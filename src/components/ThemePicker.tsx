@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Box, Text, useInput } from "ink";
+import { Box, Newline, Text, useInput } from "ink";
 import type { Theme, ThemeName } from "../types/index.js";
 import { themes } from "../themes/index.js";
 import { ThemedBox } from "./ThemedBox.js";
 import { HintBar } from "./StatusBar.js";
+import { useResponsiveLayout } from "../hooks/useResponsiveLayout.js";
 
 const THEME_NAMES = Object.keys(themes) as ThemeName[];
 
@@ -15,6 +16,8 @@ interface ThemePickerProps {
 }
 
 export function ThemePicker({ theme, currentTheme, onSelect, onCancel }: ThemePickerProps) {
+  const { maxContainerColumns } = useResponsiveLayout();
+
   const [idx, setIdx] = useState(THEME_NAMES.indexOf(currentTheme));
 
   useInput((input, key) => {
@@ -27,71 +30,84 @@ export function ThemePicker({ theme, currentTheme, onSelect, onCancel }: ThemePi
   const previewTheme = themes[THEME_NAMES[idx]];
 
   return (
-    <Box flexDirection="column" flexGrow={1}>
-      <Box flexDirection="row" flexGrow={1} gap={1}>
-        <ThemedBox theme={theme} title="THEMES" width={30} flexDirection="column" focused>
+    <Box flexDirection="column" flexGrow={1} alignItems="center" justifyContent="space-between" backgroundColor={previewTheme.bg}>
+      {/* Main content */}
+      <Box flexDirection="row" width={maxContainerColumns} justifyContent="center" alignItems="center" flexGrow={1} flexShrink={1} gap={1}>
+        {/* Left: Theme list */}
+        <Box
+          width={Math.floor(maxContainerColumns / 2)}
+          maxHeight="100%"
+          flexDirection="column"
+        >
+          <Box marginBottom={1}>
+            <Text color={previewTheme.dim} bold>
+              {'// themes'}
+            </Text>
+          </Box>
+
           {THEME_NAMES.map((name, i) => {
             const t = themes[name];
             const isSelected = i === idx;
             const isCurrent = name === currentTheme;
             return (
-              <Box key={name}>
-                {isSelected ? (
-                  <Text color={theme.highlightFg} backgroundColor={theme.highlight} bold>
-                    {` ▶ ${t.label}${isCurrent ? " ●" : ""}`.padEnd(26)}
-                  </Text>
-                ) : (
-                  <Text color={isCurrent ? theme.accent : theme.fg}>
-                    {"   " + t.label + (isCurrent ? " ●" : "")}
-                  </Text>
-                )}
+              <Box key={name} backgroundColor={isSelected ? previewTheme.accent : undefined}>
+                <Text color={isSelected ? previewTheme.bg : previewTheme.fg} bold={isSelected}>
+                  {(isCurrent ? " ● " : "   ") + t.label?.toLowerCase()}
+                </Text>
               </Box>
             );
           })}
-        </ThemedBox>
+        </Box>
 
-        {/* Preview panel */}
-        <ThemedBox theme={previewTheme} title="PREVIEW" flexGrow={1} flexDirection="column">
-          <Box flexDirection="column" gap={1}>
-            <Text color={previewTheme.fg} bold>Theme: {previewTheme.label}</Text>
-
-            <Box flexDirection="column">
-              <Text color={previewTheme.accent}>■ Accent color (headers, selection)</Text>
-              <Text color={previewTheme.accentAlt}>■ Alt accent (subheadings)</Text>
-              <Text color={previewTheme.fg}>■ Foreground text (body)</Text>
-              <Text color={previewTheme.dim}>■ Dim text (hints, labels)</Text>
-              <Text color={previewTheme.success}>■ Success / positive</Text>
+        {/* Right: Preview panel */}
+        <Box
+          borderStyle="round"
+          borderColor={previewTheme.border}
+          borderBackgroundColor={previewTheme.bg}
+          paddingX={2}
+          paddingY={1}
+          width={Math.floor(maxContainerColumns / 2)}
+          maxHeight="100%"
+        >
+          <Box flexDirection="column" flexGrow={1}>
+            <Box flexDirection="column" flexShrink={1}>
+              <Text color={previewTheme.accent}>■ Headers</Text>
+              <Text color={previewTheme.accentAlt}>■ Subheaders</Text>
+              <Text color={previewTheme.success}>■ Success</Text>
               <Text color={previewTheme.warning}>■ Warning</Text>
-              <Text color={previewTheme.error}>■ Error / delete</Text>
-              <Text color={previewTheme.cursor}>■ Cursor / selection</Text>
+              <Text color={previewTheme.error}>■ Error</Text>
             </Box>
 
-            <Box marginTop={1}>
-              <Text color={previewTheme.highlightFg} backgroundColor={previewTheme.highlight} bold>
-                {" Selected item preview "}
-              </Text>
-            </Box>
+            <Box flexDirection="column" flexShrink={0} gap={1} marginTop={1}>
+              <Text color={previewTheme.accent} bold>{`> sample profiles`}</Text>
 
-            <Box flexDirection="column" marginTop={1}>
-              <Text color={previewTheme.dim}>Sample profile list:</Text>
-              <Text color={previewTheme.highlightFg} backgroundColor={previewTheme.highlight} bold>
-                {" ▶ Llama-3.1-8B-Q4_K_M     "}
-              </Text>
-              <Text color={previewTheme.fg}>{"   Mistral-7B-Instruct     "}</Text>
-              <Text color={previewTheme.fg}>{"   Qwen2.5-14B-Q5_K_M     "}</Text>
+              <Box flexDirection="column">
+                <Text color={previewTheme.accentAlt} bold>
+                  {"Llama-3.1-8B-Q4_K_M"}
+                </Text>
+                <Text color={previewTheme.fg}>{"Mistral-7B-Instruct"}</Text>
+                <Text color={previewTheme.fg} wrap="truncate">
+                  {"Qwen3.5-9B-Q4_K_M "}
+                  <Text color={previewTheme.dim} italic>
+                    (favorite)
+                  </Text>
+                </Text>
+              </Box>
             </Box>
           </Box>
-        </ThemedBox>
+        </Box>
       </Box>
 
-      <HintBar
-        theme={theme}
-        hints={[
-          { key: "↑↓", desc: "browse" },
-          { key: "↵", desc: "apply" },
-          { key: "ESC", desc: "cancel" },
-        ]}
-      />
+      <Box flexShrink={0}>
+        <HintBar
+          theme={previewTheme}
+          hints={[
+            { key: "↑↓", desc: "browse" },
+            { key: "↵", desc: "apply" },
+            { key: "ESC", desc: "cancel" },
+          ]}
+        />
+      </Box>
     </Box>
   );
 }
