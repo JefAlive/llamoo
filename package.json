@@ -1,0 +1,26 @@
+{
+  "name": "llamoo",
+  "version": "1.0.0",
+  "description": "My llama says moo. A TUI for running gguf models with llama-server easy way",
+  "type": "module",
+  "bin": {
+    "lammoo": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.tsx",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "conf": "^13.0.0",
+    "ink": "^7.1.0",
+    "ink-text-input": "^6.0.0",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/react": "^19.2.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
