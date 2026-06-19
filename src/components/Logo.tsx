@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text } from "ink";
-import type { Theme } from "../types/index.js";
+import type { Theme } from "../types/index";
 
 interface LogoProps {
   theme: Theme;
@@ -10,7 +10,7 @@ const LLAMA_ASCII = `
 (\\_/)
 ≽•ܫ•≼
 (   )
-`.trim();;
+`.trim();
 
 const TITLE_ASCII_1 = `
 █  █  █▀▄

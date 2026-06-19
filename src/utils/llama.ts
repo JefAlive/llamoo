@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import type { GgufModel, LlamaProfile } from "../types/index.js";
+import type { GgufModel, LlamaProfile } from "../types/index";
 
 export function scanForModels(dirs: string[]): GgufModel[] {
   const models: GgufModel[] = [];

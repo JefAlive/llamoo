@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import type { Theme } from "../types/index.js";
-import { ThemedBox } from "./ThemedBox.js";
-import { HintBar } from "./StatusBar.js";
+import type { Theme } from "../types/index";
+import { ThemedBox } from "./ThemedBox";
+import { HintBar } from "./StatusBar";
+import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
 
 interface DirManagerProps {
   theme: Theme;
@@ -13,6 +14,8 @@ interface DirManagerProps {
 }
 
 export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
+  const { maxContainerColumns } = useResponsiveLayout();
+
   const [list, setList] = useState<string[]>([...dirs]);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [adding, setAdding] = useState(false);
@@ -51,13 +54,19 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
   });
 
   return (
-    <Box flexDirection="column" flexGrow={1}>
-      <ThemedBox theme={theme} title="SCAN DIRECTORIES" flexGrow={1} flexDirection="column" focused>
-        <Text color={theme.dim}>
-          Directories scanned for .gguf model files:
+    <Box flexDirection="column" flexGrow={1} alignItems="center" justifyContent="space-between" backgroundColor={theme.bg}>
+      <Box
+        flexDirection="column"
+        justifyContent="center"
+        width={maxContainerColumns}
+        flexGrow={1}
+        gap={1}
+      >
+        <Text color={theme.dim} bold>
+          // model scan directories
         </Text>
 
-        <Box flexDirection="column" marginTop={1}>
+        <Box flexDirection="column">
           {list.length === 0 ? (
             <Text color={theme.warning}>No directories configured. Press [a] to add one.</Text>
           ) : (
@@ -67,7 +76,7 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
                 <Box key={i}>
                   {isSelected ? (
                     <Text color={theme.highlightFg} backgroundColor={theme.highlight} bold>
-                      {` ▶ ${dir}`.padEnd(70)}
+                      {`   ${dir}`.padEnd(70)}
                     </Text>
                   ) : (
                     <Text color={theme.fg}>{"   " + dir}</Text>
@@ -79,7 +88,7 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
         </Box>
 
         {adding && (
-          <Box marginTop={1} gap={1}>
+          <Box gap={1}>
             <Text color={theme.accent}>Add directory:</Text>
             <TextInput
               value={newDir}
@@ -99,20 +108,20 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
         )}
 
         {confirmDelete !== null && (
-          <Box marginTop={1}>
+          <Box>
             <Text color={theme.error} bold>
               Remove "{list[confirmDelete]}"? [y] yes  [any] cancel
             </Text>
           </Box>
         )}
 
-        <Box flexDirection="column" marginTop={2}>
-          <Text color={theme.dim}>Tips:</Text>
-          <Text color={theme.dim}>  • Use ~ for home directory (e.g. ~/models)</Text>
-          <Text color={theme.dim}>  • Only the immediate directory is scanned (no recursion)</Text>
-          <Text color={theme.dim}>  • Press [s] to sync models after adding dirs</Text>
+        <Box flexDirection="column">
+          <Text color={theme.fg}>tips:</Text>
+          <Text color={theme.fg}>• Use ~ for home directory (e.g. ~/models)</Text>
+          <Text color={theme.fg}>• Only the immediate directory is scanned (no recursion)</Text>
+          <Text color={theme.fg}>• Press [s] to sync models after adding dirs</Text>
         </Box>
-      </ThemedBox>
+      </Box>
 
       <HintBar
         theme={theme}

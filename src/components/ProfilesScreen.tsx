@@ -1,11 +1,15 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { Box, Text, useInput, useStdout, useWindowSize } from "ink";
+import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { Box, Text, useInput, useStdout } from "ink";
 import TextInput from "ink-text-input";
-import type { Theme, LlamaProfile, GgufModel, AppScreen } from "../types/index.js";
-import { Logo } from "./Logo.js";
-import { HintBar } from "./StatusBar.js";
-import { formatBytes, formatTokens } from "../utils/llama.js";
-import { useResponsiveLayout } from "../hooks/useResponsiveLayout.js";
+import type { Theme, LlamaProfile, GgufModel, AppScreen } from "../types/index";
+import { Logo } from "./Logo";
+import { HintBar } from "./StatusBar";
+import { formatBytes, formatTokens } from "../utils/llama";
+import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
+import { petEvents, toast } from '../utils/petEvents';
+import { Pet } from './ui/Pet';
+import { BreathingText } from "./ui/BreathingText";
+import { AlertBox } from "./ui/AlertBox";
 
 interface ProfilesScreenProps {
   theme: Theme;
@@ -20,6 +24,10 @@ interface ProfilesScreenProps {
   onChangeDir: () => void;
   onSyncModels: () => void;
 }
+
+const WELCOME_MESSAGES = [
+  "Moo! Ops, I'm a little lost.\n\nLet's configure your models folder to get started :)",
+];
 
 export function ProfilesScreen({
   theme,
@@ -41,6 +49,9 @@ export function ProfilesScreen({
   const [searching, setSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [petLoaded, setPetLoaded] = useState(false);
+  const [isAlertBlinking, setIsAlertBlinking] = useState(false);
+  const petRef = useRef(null);
 
   const filteredProfiles = profiles.filter((p) =>
     searchQuery === ""
@@ -142,9 +153,65 @@ export function ProfilesScreen({
 
   const visibleItems = filteredProfiles.slice(scrollOffset, scrollOffset + listHeight);
 
+  useEffect(() => {
+    if (!petLoaded) {
+      if (models.length === 0) {
+        const messageId = toast(
+          WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
+        );
+
+        const handleWelcomeToastFinished = (finishedMessageId: string) => {
+          if (finishedMessageId === messageId) {
+            setIsAlertBlinking(true);
+            petEvents.off('toastFinished', handleWelcomeToastFinished);
+          }
+        }
+
+        petEvents.on('toastFinished', handleWelcomeToastFinished);
+      }
+
+      if (models.length > 0 && profiles.length === 0) {
+        const messageId = toast('Crunch-crunch..\nA profile is a set of parameteres to run a model.\nUse [a] to create one.');
+
+        const handleConfigureProfileToastFinished = (finishedMessageId: string) => {
+          if (finishedMessageId === messageId) {
+            setIsAlertBlinking(true);
+            petEvents.off('toastFinished', handleConfigureProfileToastFinished);
+          }
+        }
+
+        petEvents.on('toastFinished', handleConfigureProfileToastFinished);
+      }
+
+      if (models.length > 0 && profiles.length > 0) {
+        const messageId = toast('Yak!\nUse [e] to edit a profile.\nUse [r] to run a profile.');
+
+        const handleEditProfileToastFinished = (finishedMessageId: string) => {
+          if (finishedMessageId === messageId) {
+            setIsAlertBlinking(true);
+            petEvents.off('toastFinished', handleEditProfileToastFinished);
+          }
+        }
+
+        petEvents.on('toastFinished', handleEditProfileToastFinished);
+      }
+
+      setPetLoaded(true);
+    }
+  }, [petRef])
+
   return (
     <Box flexDirection="column" flexGrow={1} alignItems="center" backgroundColor={theme.bg}>
-      <Box flexDirection="column" width={maxContainerColumns} alignItems="center" justifyContent="space-around" paddingY={1} gap={1} flexGrow={1}>
+      <Box
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="space-around"
+        position="relative"
+        width={maxContainerColumns}
+        flexGrow={1}
+        paddingY={1}
+        gap={1}
+      >
         {/* Main content */}
         <Box flexShrink={0}>
           <Logo theme={theme} />
@@ -166,29 +233,11 @@ export function ProfilesScreen({
             </Box>
 
             {models.length === 0 && (
-              <Box
-                flexDirection="column"
-                paddingLeft={1}
-                borderStyle={{
-                  topLeft: '',
-                  top: '',
-                  topRight: '',
-                  left: '▌',
-                  bottomLeft: '',
-                  bottom: '',
-                  bottomRight: '',
-                  right: '▐',
-                }}
-                borderColor={theme.warning}
-                borderTop={false}
-                borderRight={false}
-                borderBottom={false}
-                borderBackgroundColor={theme.bg}
-                backgroundColor={theme.bg}
-              >
-                <Text color={theme.warning} bold>No models detected.</Text>
-                <Text color={theme.warning}>Press [d] to configure your model directory.</Text>
-              </Box>
+              <AlertBox
+                message="No models found. Press [d] to configure your model directory."
+                theme={theme}
+                blinking={isAlertBlinking}
+              />
             )}
 
             {models.length > 0 && (
@@ -220,9 +269,11 @@ export function ProfilesScreen({
             )}
 
             {models.length > 0 && profiles.length === 0 && (
-              <Box>
-                <Text color={theme.warning}>Press [a] to add a profile.</Text>
-              </Box>
+              <AlertBox
+                message="Press [a] to add a profile."
+                theme={theme}
+                blinking={isAlertBlinking}
+              />
             )}
 
             {profiles.length > 0 && filteredProfiles.length === 0 && (
@@ -326,6 +377,19 @@ export function ProfilesScreen({
                 )}
               </Box>
             )}
+          </Box>
+
+          <Box
+            position="absolute"
+            bottom={-1}
+            right={-4}
+            width={Math.floor(maxContainerColumns * 0.5)}
+            justifyContent="flex-end"
+            alignItems="flex-end"
+          >
+            <Box justifyContent="flex-end" paddingX={2}>
+              <Pet ref={petRef} theme={theme} />
+            </Box>
           </Box>
         </Box>
       </Box>

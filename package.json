@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "conf": "^13.0.0",
+    "grapheme-splitter": "^1.0.4",
     "ink": "^7.1.0",
     "ink-text-input": "^6.0.0",
     "react": "^19.2.0"

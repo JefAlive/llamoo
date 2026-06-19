@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Box, Text, useApp, useWindowSize } from "ink";
-import type { ThemeName, LlamaProfile, AppScreen } from "./types/index.js";
-import { themes, getTheme } from "./themes/index.js";
+import type { ThemeName, LlamaProfile, AppScreen } from "./types/index";
+import { themes, getTheme } from "./themes/index";
 import {
   getThemeName, setThemeName,
   getScanDirs, setScanDirs,
@@ -9,12 +9,12 @@ import {
   getModels, setModels,
   makeDefaultProfile,
 } from "./store/config.js";
-import { scanForModels } from "./utils/llama.js";
-import { ProfilesScreen } from "./components/ProfilesScreen.js";
-import { ProfileEditor } from "./components/ProfileEditor.js";
-import { ThemePicker } from "./components/ThemePicker.js";
-import { DirManager } from "./components/DirManager.js";
-import { RunnerScreen } from "./components/RunnerScreen.js";
+import { scanForModels } from "./utils/llama";
+import { ProfilesScreen } from "./components/ProfilesScreen";
+import { ProfileEditor } from "./components/ProfileEditor";
+import { ThemePicker } from "./components/ThemePicker";
+import { DirManager } from "./components/DirManager";
+import { RunnerScreen } from "./components/RunnerScreen";
 
 // Detect llama-server binary
 function findLlamaServer(): string {
@@ -103,16 +103,6 @@ export function App() {
   }, []);
 
   const llamaBin = findLlamaServer();
-
-  // Title bar
-  const titleBar = (
-    <Box paddingX={1} gap={2} flexShrink={0}>
-      <Text color={theme.dim}>
-        {screen === "profiles" && `${profiles.length} profiles · ${models.length} models`}
-        {screen === "profile-run" && `Running: ${runningProfile?.name ?? ""}`}
-      </Text>
-    </Box>
-  );
 
   return (
     <Box flexDirection="column" flexGrow={1} height={rows}>

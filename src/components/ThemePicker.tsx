@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Box, Newline, Text, useInput } from "ink";
-import type { Theme, ThemeName } from "../types/index.js";
-import { themes } from "../themes/index.js";
-import { ThemedBox } from "./ThemedBox.js";
-import { HintBar } from "./StatusBar.js";
-import { useResponsiveLayout } from "../hooks/useResponsiveLayout.js";
+import type { Theme, ThemeName } from "../types/index";
+import { themes } from "../themes/index";
+import { ThemedBox } from "./ThemedBox";
+import { HintBar } from "./StatusBar";
+import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
 
 const THEME_NAMES = Object.keys(themes) as ThemeName[];
 

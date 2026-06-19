@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import type { Theme, LlamaProfile, GgufModel } from "../types/index.js";
-import { ThemedBox } from "./ThemedBox.js";
-import { HintBar } from "./StatusBar.js";
+import type { Theme, LlamaProfile, GgufModel } from "../types/index";
+import { ThemedBox } from "./ThemedBox";
+import { HintBar } from "./StatusBar";
+import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
 
 interface ProfileEditorProps {
   theme: Theme;
@@ -88,6 +89,8 @@ export function ProfileEditor({
   onSave,
   onCancel,
 }: ProfileEditorProps) {
+  const { maxContainerColumns } = useResponsiveLayout();
+  
   const [draft, setDraft] = useState<LlamaProfile>({ ...profile });
   const [fieldIdx, setFieldIdx] = useState(0);
   const [editing, setEditing] = useState(false);
@@ -235,8 +238,13 @@ export function ProfileEditor({
   }
 
   return (
-    <Box flexDirection="column" flexGrow={1}>
-      <Box flexDirection="row" flexGrow={1} gap={1}>
+    <Box flexDirection="column" flexGrow={1} alignItems="center" backgroundColor={theme.bg}>
+      <Box
+        flexDirection="row"
+        width={maxContainerColumns}
+        flexGrow={1}
+        gap={1}
+      >
         {/* Fields list */}
         <ThemedBox theme={theme} title={`EDIT: ${draft.name}`} width={52} flexDirection="column" focused>
           {visibleFields.map((field, i) => {

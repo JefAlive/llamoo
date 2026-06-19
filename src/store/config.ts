@@ -1,6 +1,6 @@
 import Conf from "conf";
-import type { ThemeName, LlamaProfile, GgufModel } from "../types/index.js";
-import { nanoid } from "./nanoid.js";
+import type { ThemeName, LlamaProfile, GgufModel } from "../types/index";
+import { nanoid } from "./nanoid";
 
 interface StoreSchema {
   theme: ThemeName;

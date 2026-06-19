@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Box, Text, useInput, useStdout } from "ink";
 import { spawn, ChildProcess } from "child_process";
-import type { Theme, LlamaProfile } from "../types/index.js";
-import { ThemedBox } from "./ThemedBox.js";
-import { HintBar } from "./StatusBar.js";
-import { buildLlamaArgs } from "../utils/llama.js";
+import type { Theme, LlamaProfile } from "../types/index";
+import { ThemedBox } from "./ThemedBox";
+import { HintBar } from "./StatusBar";
+import { buildLlamaArgs } from "../utils/llama";
 
 interface RunnerScreenProps {
   theme: Theme;
