@@ -7,6 +7,7 @@ import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
 import { BreathingText } from "./ui/BreathingText";
 import chalk from "chalk";
 import { SelectableList } from "./ui/SelectableList";
+import { PageLayout } from "./ui/PageLayout";
 
 interface DirManagerProps {
   theme: Theme;
@@ -56,19 +57,17 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
   });
 
   return (
-    <Box flexDirection="column" flexGrow={1} alignItems="center" justifyContent="space-between" backgroundColor={theme.bg}>
-      <Box
-        flexDirection="column"
-        justifyContent="center"
-        width={maxContainerColumns}
-        flexGrow={1}
-        gap={1}
-      >
-        <Text color={theme.dim} bold>
-          model scan directories
-        </Text>
+    <PageLayout
+      theme={theme}
+      hasBorder={true} // Cria uma borda round bonita ao redor das dicas na direita
+      leftColumn={
+        <Box flexDirection="column" gap={1}>
+          <Box width="100%">
+            <Text color={theme.dim} bold>
+              model scan directories
+            </Text>
+          </Box>
 
-        <Box flexDirection="column" paddingX={2}>
           {list.length === 0 && (
             <Text color={theme.warning}>No directories configured. Press [a] to add one.</Text>
           )}
@@ -78,55 +77,52 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
             selectedIdx={selectedIdx}
             theme={theme}
           />
+
+          {adding && (
+            <Box gap={1} marginTop={1}>
+              <Text color={theme.accent}>Add directory:</Text>
+              <TextInput
+                value={newDir}
+                onChange={setNewDir}
+                onSubmit={(val) => {
+                  if (val.trim()) {
+                    setList((prev) => [...prev, val.trim()]);
+                    setSelectedIdx(list.length);
+                  }
+                  setAdding(false);
+                  setNewDir("");
+                }}
+                focus={true}
+              />
+              <Text color={theme.dim}>(ESC to cancel)</Text>
+            </Box>
+          )}
+
+          {confirmDelete !== null && (
+            <Box marginTop={1}>
+              <Text color={theme.error} bold>
+                Remove "{list[confirmDelete]}"? [y] yes  [any] cancel
+              </Text>
+            </Box>
+          )}
         </Box>
-
-        {adding && (
-          <Box gap={1}>
-            <Text color={theme.accent}>Add directory:</Text>
-            <TextInput
-              value={newDir}
-              onChange={setNewDir}
-              onSubmit={(val) => {
-                if (val.trim()) {
-                  setList((prev) => [...prev, val.trim()]);
-                  setSelectedIdx(list.length);
-                }
-                setAdding(false);
-                setNewDir("");
-              }}
-              focus={true}
-            />
-            <Text color={theme.dim}>(ESC to cancel)</Text>
-          </Box>
-        )}
-
-        {confirmDelete !== null && (
-          <Box>
-            <Text color={theme.error} bold>
-              Remove "{list[confirmDelete]}"? [y] yes  [any] cancel
-            </Text>
-          </Box>
-        )}
-
+      }
+      rightColumn={
         <Box flexDirection="column" gap={1}>
           <Text color={theme.dim} bold>tips</Text>
-          <Box paddingLeft={2} flexDirection="column">
-            <Text color={theme.fg}>Use ~ for home directory (e.g. ~/models)</Text>
-            <Text color={theme.fg}>Only the immediate directory is scanned (no recursion)</Text>
-            <Text color={theme.fg}>Press [s] to sync models after adding dirs</Text>
+          <Box flexDirection="column" gap={0}>
+            <Text color={theme.fg}>• Use ~ for home directory (e.g. ~/models)</Text>
+            <Text color={theme.fg}>• Only immediate directory is scanned</Text>
+            <Text color={theme.fg}>• Press [s] to sync models after adding dirs</Text>
           </Box>
         </Box>
-      </Box>
-
-      <HintBar
-        theme={theme}
-        hints={[
-          { key: "a", desc: "add dir" },
-          { key: "x", desc: "remove" },
-          { key: "↵", desc: "save & close" },
-          { key: "ESC", desc: "cancel" },
-        ]}
-      />
-    </Box>
+      }
+      hints={[
+        { key: "a", desc: "add dir" },
+        { key: "x", desc: "remove" },
+        { key: "↵", desc: "save & close" },
+        { key: "ESC", desc: "cancel" },
+      ]}
+    />
   );
 }
