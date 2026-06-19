@@ -1,10 +1,10 @@
-import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import type { Theme } from "../../types/index";
+import { useState } from "react";
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
-import { SelectableList } from "../ui/SelectableList";
+import type { Theme } from "../../types/index";
 import { PageLayout } from "../ui/PageLayout";
+import { SelectableList } from "../ui/SelectableList";
 
 interface DirManagerProps {
   theme: Theme;

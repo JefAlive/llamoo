@@ -1,8 +1,8 @@
 import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import reactPlugin from "eslint-plugin-react";
 import prettierConfig from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
+import reactPlugin from "eslint-plugin-react";
+import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   js.configs.recommended,
@@ -14,16 +14,18 @@ export default tseslint.config(
       prettier: prettierPlugin,
     },
     languageOptions: {
+      parser: tseslint.parser, // Força o uso do parser correto do TS
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
         },
+        project: "./tsconfig.json", // Conecta o ESLint diretamente ao seu tsconfig
       },
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
       "prettier/prettier": "error",
-      "react/react-in-jsx-scope": "off", // Desnecessário no React moderno
+      "react/react-in-jsx-scope": "off",
     },
     settings: {
       react: {

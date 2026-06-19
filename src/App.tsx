@@ -1,25 +1,25 @@
-import React, { useState, useCallback } from "react";
 import { Box, useApp, useWindowSize } from "ink";
-import type { ThemeName, LlamaProfile, AppScreen } from "./types/index";
-import { getTheme } from "./themes/index";
+import { useCallback, useState } from "react";
+import { DirManager } from "./components/pages/DirManager";
+import { ProfileEditor } from "./components/pages/ProfileEditor";
+import { ProfilesScreen } from "./components/pages/ProfilesScreen";
+import { RunnerScreen } from "./components/pages/RunnerScreen";
+import { ThemePicker } from "./components/pages/ThemePicker";
 import {
-  getThemeName,
-  setThemeName,
-  getScanDirs,
-  setScanDirs,
-  getProfiles,
-  saveProfile,
   deleteProfile,
   getModels,
-  setModels,
+  getProfiles,
+  getScanDirs,
+  getThemeName,
   makeDefaultProfile,
+  saveProfile,
+  setModels,
+  setScanDirs,
+  setThemeName,
 } from "./store/config.js";
+import { getTheme } from "./themes/index";
+import type { AppScreen, LlamaProfile, ThemeName } from "./types/index";
 import { scanForModels } from "./utils/llama";
-import { ProfilesScreen } from "./components/pages/ProfilesScreen";
-import { ProfileEditor } from "./components/pages/ProfileEditor";
-import { ThemePicker } from "./components/pages/ThemePicker";
-import { DirManager } from "./components/pages/DirManager";
-import { RunnerScreen } from "./components/pages/RunnerScreen";
 
 // Detect llama-server binary
 function findLlamaServer(): string {

@@ -1,8 +1,8 @@
-import React, { useRef } from "react";
-import { HintBar } from "../ui/StatusBar";
 import { Box } from "ink";
-import { Pet } from "./Pet";
+import React, { useRef } from "react";
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import { HintBar } from "../ui/StatusBar";
+import { Pet } from "./Pet";
 
 // Definição das propriedades do layout
 interface HintItem {

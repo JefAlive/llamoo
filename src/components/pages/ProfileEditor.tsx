@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import type { Theme, LlamaProfile, GgufModel } from "../../types/index";
+import { useCallback, useState } from "react";
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import type { GgufModel, LlamaProfile, Theme } from "../../types/index";
 import { PageLayout } from "../ui/PageLayout";
 import { SelectableList } from "../ui/SelectableList";
 

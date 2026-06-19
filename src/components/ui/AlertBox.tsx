@@ -1,6 +1,6 @@
 import { Box } from "ink";
-import { BreathingText } from "./BreathingText";
 import type { Theme } from "../../types";
+import { BreathingText } from "./BreathingText";
 
 interface AlertBoxProps {
   message: string;

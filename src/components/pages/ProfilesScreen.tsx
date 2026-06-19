@@ -1,25 +1,19 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
 import { Box, Text, useInput, useStdout } from "ink";
 import TextInput from "ink-text-input";
-import type {
-  Theme,
-  LlamaProfile,
-  GgufModel,
-  AppScreen,
-} from "../../types/index";
-import { Logo } from "../ui/Logo";
-import { formatBytes, formatTokens } from "../../utils/llama";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import type {
+  AppScreen,
+  GgufModel,
+  LlamaProfile,
+  Theme,
+} from "../../types/index";
+import { formatBytes, formatTokens } from "../../utils/llama";
 import { petEvents, toast } from "../../utils/petEvents";
 import { AlertBox } from "../ui/AlertBox";
-import { SelectableList } from "../ui/SelectableList";
+import { Logo } from "../ui/Logo";
 import { PageLayout } from "../ui/PageLayout";
+import { SelectableList } from "../ui/SelectableList";
 
 interface ProfilesScreenProps {
   theme: Theme;

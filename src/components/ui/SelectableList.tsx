@@ -1,7 +1,6 @@
-import React from "react";
+import chalk from "chalk";
 import { Box, Text } from "ink";
 import { BreathingText } from "./BreathingText";
-import chalk from "chalk";
 
 interface SelectableItemData {
   id: string | number;

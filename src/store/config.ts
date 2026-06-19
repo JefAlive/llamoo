@@ -1,5 +1,5 @@
 import Conf from "conf";
-import type { ThemeName, LlamaProfile, GgufModel } from "../types/index";
+import type { GgufModel, LlamaProfile, ThemeName } from "../types/index";
 import { nanoid } from "./nanoid";
 
 interface StoreSchema {

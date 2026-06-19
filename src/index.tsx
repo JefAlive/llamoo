@@ -3,7 +3,6 @@
 import chalk from "chalk";
 chalk.level = 3;
 
-import React from "react";
 import { render } from "ink";
 import { App } from "./App";
 
