@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
 import type { Theme } from "../types/index";
-import { ThemedBox } from "./ThemedBox";
 import { HintBar } from "./StatusBar";
 import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
+import { BreathingText } from "./ui/BreathingText";
+import chalk from "chalk";
+import { SelectableList } from "./ui/SelectableList";
 
 interface DirManagerProps {
   theme: Theme;
@@ -63,28 +65,19 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
         gap={1}
       >
         <Text color={theme.dim} bold>
-          // model scan directories
+          model scan directories
         </Text>
 
-        <Box flexDirection="column">
-          {list.length === 0 ? (
+        <Box flexDirection="column" paddingX={2}>
+          {list.length === 0 && (
             <Text color={theme.warning}>No directories configured. Press [a] to add one.</Text>
-          ) : (
-            list.map((dir, i) => {
-              const isSelected = i === selectedIdx;
-              return (
-                <Box key={i}>
-                  {isSelected ? (
-                    <Text color={theme.highlightFg} backgroundColor={theme.highlight} bold>
-                      {`   ${dir}`.padEnd(70)}
-                    </Text>
-                  ) : (
-                    <Text color={theme.fg}>{"   " + dir}</Text>
-                  )}
-                </Box>
-              );
-            })
           )}
+
+          <SelectableList
+            items={list.map((dir, i) => ({ id: i, label: dir }))}
+            selectedIdx={selectedIdx}
+            theme={theme}
+          />
         </Box>
 
         {adding && (
@@ -115,11 +108,13 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
           </Box>
         )}
 
-        <Box flexDirection="column">
-          <Text color={theme.fg}>tips:</Text>
-          <Text color={theme.fg}>• Use ~ for home directory (e.g. ~/models)</Text>
-          <Text color={theme.fg}>• Only the immediate directory is scanned (no recursion)</Text>
-          <Text color={theme.fg}>• Press [s] to sync models after adding dirs</Text>
+        <Box flexDirection="column" gap={1}>
+          <Text color={theme.dim} bold>tips</Text>
+          <Box paddingLeft={2} flexDirection="column">
+            <Text color={theme.fg}>Use ~ for home directory (e.g. ~/models)</Text>
+            <Text color={theme.fg}>Only the immediate directory is scanned (no recursion)</Text>
+            <Text color={theme.fg}>Press [s] to sync models after adding dirs</Text>
+          </Box>
         </Box>
       </Box>
 

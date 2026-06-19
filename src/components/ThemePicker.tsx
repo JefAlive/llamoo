@@ -5,6 +5,8 @@ import { themes } from "../themes/index";
 import { ThemedBox } from "./ThemedBox";
 import { HintBar } from "./StatusBar";
 import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
+import { SelectableList } from "./ui/SelectableList";
+import chalk from "chalk";
 
 const THEME_NAMES = Object.keys(themes) as ThemeName[];
 
@@ -41,22 +43,25 @@ export function ThemePicker({ theme, currentTheme, onSelect, onCancel }: ThemePi
         >
           <Box marginBottom={1}>
             <Text color={previewTheme.dim} bold>
-              {'// themes'}
+              {'themes'}
             </Text>
           </Box>
 
-          {THEME_NAMES.map((name, i) => {
-            const t = themes[name];
-            const isSelected = i === idx;
-            const isCurrent = name === currentTheme;
-            return (
-              <Box key={name} backgroundColor={isSelected ? previewTheme.accent : undefined}>
-                <Text color={isSelected ? previewTheme.bg : previewTheme.fg} bold={isSelected}>
-                  {(isCurrent ? " ● " : "   ") + t.label?.toLowerCase()}
-                </Text>
-              </Box>
-            );
-          })}
+          <SelectableList
+            items={THEME_NAMES.map((name, i) => {
+              const t = themes[name];
+              const isCurrent = name === currentTheme;
+              
+              return {
+                id: name,
+                // Adiciona a bolinha estática "●" na frente se for o tema atual
+                label: t.label?.toLowerCase() + (isCurrent ? chalk.hex(previewTheme.dim).italic(" [in use]") : "")
+              };
+            })}
+            selectedIdx={idx}
+            theme={previewTheme}
+          />
+
         </Box>
 
         {/* Right: Preview panel */}

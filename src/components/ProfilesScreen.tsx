@@ -10,6 +10,7 @@ import { petEvents, toast } from '../utils/petEvents';
 import { Pet } from './ui/Pet';
 import { BreathingText } from "./ui/BreathingText";
 import { AlertBox } from "./ui/AlertBox";
+import { SelectableList } from "./ui/SelectableList";
 
 interface ProfilesScreenProps {
   theme: Theme;
@@ -228,7 +229,7 @@ export function ProfilesScreen({
           >
             <Box flexShrink={0}>
               <Text color={theme.dim} bold>
-                {'// models'}
+                {'models'}
               </Text>
             </Box>
 
@@ -241,9 +242,9 @@ export function ProfilesScreen({
             )}
 
             {models.length > 0 && (
-              <Box>
+              <Box paddingLeft={2}>
                 <Text color={theme.fg}>
-                  {`   ${models.length} ${models.length === 1 ? "model" : "models"} detected`}
+                  {`${models.length} ${models.length === 1 ? "model" : "models"} detected`}
                 </Text>
               </Box>
             )}
@@ -251,7 +252,7 @@ export function ProfilesScreen({
             {(models.length > 0 || profiles.length > 0) && (
               <Box>
                 <Text color={theme.dim} bold>
-                  {'// profiles'}
+                  {'profiles'}
                 </Text>
                 {(searching || searchQuery) && (
                   <>
@@ -276,32 +277,13 @@ export function ProfilesScreen({
               />
             )}
 
-            {profiles.length > 0 && filteredProfiles.length === 0 && (
-              <Box>
-                <Text color={theme.dim}>
-                  No results for your search.
-                </Text>
-              </Box>
-            )}
-
-            <Box flexDirection="column">
-              {visibleItems.map((profile, i) => {
-                const realIdx = i + scrollOffset;
-                const isSelected = realIdx === selectedIdx;
-                return (
-                  <Box key={profile.id} flexDirection="row" paddingX={3} height={1} backgroundColor={isSelected ? theme.accent : undefined}>
-                    <Text color={isSelected ? theme.bg : theme.fg} bold={isSelected} wrap="truncate-middle">
-                      {profile.name}
-                    </Text>
-                  </Box>
-                );
-              })}
-              {filteredProfiles.length > listHeight && (
-                <Text color={theme.dim}>
-                  {`  ${scrollOffset + 1}-${Math.min(scrollOffset + listHeight, filteredProfiles.length)} of ${filteredProfiles.length}`}
-                </Text>
-              )}
-            </Box>
+            <SelectableList
+              items={filteredProfiles.map(p => ({ id: p.id, label: p.name }))}
+              selectedIdx={selectedIdx}
+              theme={theme}
+              scrollOffset={scrollOffset}
+              listHeight={listHeight}
+            />
           </Box>
 
           {/* Right: profile details */}
