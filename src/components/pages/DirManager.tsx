@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import type { Theme } from "../types/index";
-import { HintBar } from "./StatusBar";
-import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
-import { BreathingText } from "./ui/BreathingText";
-import chalk from "chalk";
-import { SelectableList } from "./ui/SelectableList";
-import { PageLayout } from "./ui/PageLayout";
+import type { Theme } from "../../types/index";
+import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import { SelectableList } from "../ui/SelectableList";
+import { PageLayout } from "../ui/PageLayout";
 
 interface DirManagerProps {
   theme: Theme;

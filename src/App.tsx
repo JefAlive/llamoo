@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
-import { Box, Text, useApp, useWindowSize } from "ink";
+import { Box, useApp, useWindowSize } from "ink";
 import type { ThemeName, LlamaProfile, AppScreen } from "./types/index";
-import { themes, getTheme } from "./themes/index";
+import { getTheme } from "./themes/index";
 import {
   getThemeName, setThemeName,
   getScanDirs, setScanDirs,
@@ -10,11 +10,11 @@ import {
   makeDefaultProfile,
 } from "./store/config.js";
 import { scanForModels } from "./utils/llama";
-import { ProfilesScreen } from "./components/ProfilesScreen";
-import { ProfileEditor } from "./components/ProfileEditor";
-import { ThemePicker } from "./components/ThemePicker";
-import { DirManager } from "./components/DirManager";
-import { RunnerScreen } from "./components/RunnerScreen";
+import { ProfilesScreen } from "./components/pages/ProfilesScreen";
+import { ProfileEditor } from "./components/pages/ProfileEditor";
+import { ThemePicker } from "./components/pages/ThemePicker";
+import { DirManager } from "./components/pages/DirManager";
+import { RunnerScreen } from "./components/pages/RunnerScreen";
 
 // Detect llama-server binary
 function findLlamaServer(): string {

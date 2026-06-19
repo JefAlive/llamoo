@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { HintBar } from '../StatusBar';
+import { HintBar } from '../ui/StatusBar';
 import { Box } from 'ink';
 import { Pet } from './Pet';
 import { useResponsiveLayout } from '../../hooks/useResponsiveLayout';

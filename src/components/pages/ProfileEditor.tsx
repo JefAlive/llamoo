@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
-import type { Theme, LlamaProfile, GgufModel } from "../types/index";
-import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
-import { PageLayout } from "./ui/PageLayout";
-import { SelectableList } from "./ui/SelectableList";
+import type { Theme, LlamaProfile, GgufModel } from "../../types/index";
+import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import { PageLayout } from "../ui/PageLayout";
+import { SelectableList } from "../ui/SelectableList";
 
 interface ProfileEditorProps {
   theme: Theme;

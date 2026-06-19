@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Box, Newline, Text, useInput } from "ink";
-import type { Theme, ThemeName } from "../types/index";
-import { themes } from "../themes/index";
-import { HintBar } from "./StatusBar";
-import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
-import { SelectableList } from "./ui/SelectableList";
+import { Box, Text, useInput } from "ink";
+import type { Theme, ThemeName } from "../../types/index";
+import { themes } from "../../themes/index";
+import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import { SelectableList } from "../ui/SelectableList";
 import chalk from "chalk";
-import { PageLayout } from "./ui/PageLayout";
+import { PageLayout } from "../ui/PageLayout";
 
 const THEME_NAMES = Object.keys(themes) as ThemeName[];
 

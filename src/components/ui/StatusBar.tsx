@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text } from "ink";
-import type { Theme } from "../types/index";
+import type { Theme } from "../../types/index";
 
 interface StatusBarProps {
   theme: Theme;
