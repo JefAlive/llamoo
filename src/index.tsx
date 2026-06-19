@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+
+import chalk from "chalk";
+chalk.level = 3;
+
 import React from "react";
 import { render } from "ink";
 import { App } from "./App";
