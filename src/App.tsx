@@ -3,10 +3,15 @@ import { Box, useApp, useWindowSize } from "ink";
 import type { ThemeName, LlamaProfile, AppScreen } from "./types/index";
 import { getTheme } from "./themes/index";
 import {
-  getThemeName, setThemeName,
-  getScanDirs, setScanDirs,
-  getProfiles, saveProfile, deleteProfile,
-  getModels, setModels,
+  getThemeName,
+  setThemeName,
+  getScanDirs,
+  setScanDirs,
+  getProfiles,
+  saveProfile,
+  deleteProfile,
+  getModels,
+  setModels,
   makeDefaultProfile,
 } from "./store/config.js";
 import { scanForModels } from "./utils/llama";
@@ -37,8 +42,12 @@ export function App() {
   const [scanDirs, setScanDirsState] = useState<string[]>(getScanDirs());
   const [models, setModelsState] = useState(getModels());
   const [profiles, setProfilesState] = useState<LlamaProfile[]>(getProfiles());
-  const [editingProfile, setEditingProfile] = useState<LlamaProfile | null>(null);
-  const [runningProfile, setRunningProfile] = useState<LlamaProfile | null>(null);
+  const [editingProfile, setEditingProfile] = useState<LlamaProfile | null>(
+    null
+  );
+  const [runningProfile, setRunningProfile] = useState<LlamaProfile | null>(
+    null
+  );
 
   const theme = getTheme(themeName);
 
@@ -80,17 +89,23 @@ export function App() {
     setScreen("profile-edit");
   }, []);
 
-  const handleSaveProfile = useCallback((profile: LlamaProfile) => {
-    saveProfile(profile);
-    refreshProfiles();
-    setEditingProfile(null);
-    setScreen("profiles");
-  }, [refreshProfiles]);
+  const handleSaveProfile = useCallback(
+    (profile: LlamaProfile) => {
+      saveProfile(profile);
+      refreshProfiles();
+      setEditingProfile(null);
+      setScreen("profiles");
+    },
+    [refreshProfiles]
+  );
 
-  const handleDeleteProfile = useCallback((id: string) => {
-    deleteProfile(id);
-    refreshProfiles();
-  }, [refreshProfiles]);
+  const handleDeleteProfile = useCallback(
+    (id: string) => {
+      deleteProfile(id);
+      refreshProfiles();
+    },
+    [refreshProfiles]
+  );
 
   const handleRunProfile = useCallback((profile: LlamaProfile) => {
     setRunningProfile(profile);

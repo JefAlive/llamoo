@@ -16,15 +16,24 @@ interface ThemePickerProps {
   onCancel: () => void;
 }
 
-export function ThemePicker({ theme, currentTheme, onSelect, onCancel }: ThemePickerProps) {
+export function ThemePicker({
+  theme,
+  currentTheme,
+  onSelect,
+  onCancel,
+}: ThemePickerProps) {
   const { maxContainerColumns } = useResponsiveLayout();
 
   const [idx, setIdx] = useState(THEME_NAMES.indexOf(currentTheme));
 
   useInput((input, key) => {
-    if (key.escape || input === "q") { onCancel(); return; }
+    if (key.escape || input === "q") {
+      onCancel();
+      return;
+    }
     if (key.upArrow) setIdx((p) => Math.max(0, p - 1));
-    else if (key.downArrow) setIdx((p) => Math.min(THEME_NAMES.length - 1, p + 1));
+    else if (key.downArrow)
+      setIdx((p) => Math.min(THEME_NAMES.length - 1, p + 1));
     else if (key.return) onSelect(THEME_NAMES[idx]);
   });
 
@@ -38,7 +47,7 @@ export function ThemePicker({ theme, currentTheme, onSelect, onCancel }: ThemePi
         <>
           <Box marginBottom={1}>
             <Text color={previewTheme.dim} bold>
-              {'themes'}
+              {"themes"}
             </Text>
           </Box>
 
@@ -46,10 +55,14 @@ export function ThemePicker({ theme, currentTheme, onSelect, onCancel }: ThemePi
             items={THEME_NAMES.map((name) => {
               const t = themes[name];
               const isCurrent = name === currentTheme;
-              
+
               return {
                 id: name,
-                label: t.label?.toLowerCase() + (isCurrent ? chalk.hex(previewTheme.dim).italic(" [in use]") : "")
+                label:
+                  t.label?.toLowerCase() +
+                  (isCurrent
+                    ? chalk.hex(previewTheme.dim).italic(" [in use]")
+                    : ""),
               };
             })}
             selectedIdx={idx}

@@ -39,12 +39,22 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
       return;
     }
 
-    if (key.escape || input === "q") { onCancel(); return; }
-    if (input === "s" && key.ctrl) { onSave(list); return; }
-    if (key.return) { onSave(list); return; }
+    if (key.escape || input === "q") {
+      onCancel();
+      return;
+    }
+    if (input === "s" && key.ctrl) {
+      onSave(list);
+      return;
+    }
+    if (key.return) {
+      onSave(list);
+      return;
+    }
 
     if (key.upArrow) setSelectedIdx((p) => Math.max(0, p - 1));
-    else if (key.downArrow) setSelectedIdx((p) => Math.min(list.length - 1, p + 1));
+    else if (key.downArrow)
+      setSelectedIdx((p) => Math.min(list.length - 1, p + 1));
     else if (input === "a") {
       setNewDir("");
       setAdding(true);
@@ -66,7 +76,9 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
           </Box>
 
           {list.length === 0 && (
-            <Text color={theme.warning}>No directories configured. Press [a] to add one.</Text>
+            <Text color={theme.warning}>
+              No directories configured. Press [a] to add one.
+            </Text>
           )}
 
           <SelectableList
@@ -98,7 +110,7 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
           {confirmDelete !== null && (
             <Box marginTop={1}>
               <Text color={theme.error} bold>
-                Remove "{list[confirmDelete]}"? [y] yes  [any] cancel
+                Remove "{list[confirmDelete]}"? [y] yes [any] cancel
               </Text>
             </Box>
           )}
@@ -106,11 +118,17 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
       }
       rightColumn={
         <Box flexDirection="column" gap={1}>
-          <Text color={theme.dim} bold>tips</Text>
+          <Text color={theme.dim} bold>
+            tips
+          </Text>
           <Box flexDirection="column" gap={0}>
-            <Text color={theme.fg}>• Use ~ for home directory (e.g. ~/models)</Text>
+            <Text color={theme.fg}>
+              • Use ~ for home directory (e.g. ~/models)
+            </Text>
             <Text color={theme.fg}>• Only immediate directory is scanned</Text>
-            <Text color={theme.fg}>• Press [s] to sync models after adding dirs</Text>
+            <Text color={theme.fg}>
+              • Press [s] to sync models after adding dirs
+            </Text>
           </Box>
         </Box>
       }

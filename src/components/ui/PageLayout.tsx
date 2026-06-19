@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
-import { HintBar } from '../ui/StatusBar';
-import { Box } from 'ink';
-import { Pet } from './Pet';
-import { useResponsiveLayout } from '../../hooks/useResponsiveLayout';
+import React, { useRef } from "react";
+import { HintBar } from "../ui/StatusBar";
+import { Box } from "ink";
+import { Pet } from "./Pet";
+import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 
 // Definição das propriedades do layout
 interface HintItem {
@@ -13,10 +13,10 @@ interface HintItem {
 interface PageLayoutProps {
   theme: any;
   hints: HintItem[];
-  header?: React.ReactNode;       // Equivale ao children 1 (opcional)
-  leftColumn: React.ReactNode;    // Equivale ao children 2
-  rightColumn: React.ReactNode;   // Equivale ao children 3
-  hasBorder?: boolean;            // Substitui a lógica antiga do profiles.length
+  header?: React.ReactNode; // Equivale ao children 1 (opcional)
+  leftColumn: React.ReactNode; // Equivale ao children 2
+  rightColumn: React.ReactNode; // Equivale ao children 3
+  hasBorder?: boolean; // Substitui a lógica antiga do profiles.length
 }
 
 export function PageLayout({
@@ -25,17 +25,22 @@ export function PageLayout({
   header,
   leftColumn,
   rightColumn,
-  hasBorder = true
+  hasBorder = true,
 }: PageLayoutProps) {
   const petRef = useRef(null);
   const { isDesktop, maxContainerColumns } = useResponsiveLayout();
-  
+
   // Calcula as larguras das colunas baseado no ambiente
   const leftWidth = Math.floor(maxContainerColumns * (isDesktop ? 0.6 : 0.5));
   const rightWidth = Math.floor(maxContainerColumns * (isDesktop ? 0.4 : 0.5));
 
   return (
-    <Box flexDirection="column" flexGrow={1} alignItems="center" backgroundColor={theme.bg}>
+    <Box
+      flexDirection="column"
+      flexGrow={1}
+      alignItems="center"
+      backgroundColor={theme.bg}
+    >
       <Box
         flexDirection="column"
         alignItems="center"
@@ -47,13 +52,16 @@ export function PageLayout({
         gap={1}
       >
         {/* Renderiza o Header (children 1) apenas se ele for enviado */}
-        <Box flexShrink={0}>
-          {header}
-        </Box>
+        <Box flexShrink={0}>{header}</Box>
 
         {/* Container das duas colunas */}
-        <Box flexDirection="row" justifyContent="center" alignItems="center" gap={2} flexShrink={1}>
-          
+        <Box
+          flexDirection="row"
+          justifyContent="center"
+          alignItems="center"
+          gap={2}
+          flexShrink={1}
+        >
           {/* Coluna Esquerda (children 2) */}
           <Box
             flexDirection="column"

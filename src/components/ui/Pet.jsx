@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import { Box } from 'ink';
+import { Box } from "ink";
 
-import { petEvents } from '../../utils/petEvents';
-import { PixelSprite } from './PixelSprite';
-import { Toast } from './Toast';
+import { petEvents } from "../../utils/petEvents";
+import { PixelSprite } from "./PixelSprite";
+import { Toast } from "./Toast";
 
 export function Pet({ ref, theme }) {
   const [toastMessage, setToastMessage] = useState({});
@@ -12,13 +12,16 @@ export function Pet({ ref, theme }) {
 
   useEffect(() => {
     function handleToast(message, messageId) {
-      setMessagesQueue((previousQueue) => [...previousQueue, { message, messageId }]);
+      setMessagesQueue((previousQueue) => [
+        ...previousQueue,
+        { message, messageId },
+      ]);
     }
 
-    petEvents.on('toast', handleToast);
+    petEvents.on("toast", handleToast);
 
     return () => {
-      petEvents.off('toast', handleToast);
+      petEvents.off("toast", handleToast);
     };
   }, []);
 
@@ -28,13 +31,18 @@ export function Pet({ ref, theme }) {
   }, [messagesQueue]);
 
   const handleToastFinish = () => {
-    petEvents.emit('toastFinished', toastMessage.messageId);
+    petEvents.emit("toastFinished", toastMessage.messageId);
 
     setMessagesQueue((previousQueue) => previousQueue.slice(1));
-  }
+  };
 
   return (
-    <Box ref={ref} flexDirection="row" justifyContent="flex-end" alignItems="flex-end">
+    <Box
+      ref={ref}
+      flexDirection="row"
+      justifyContent="flex-end"
+      alignItems="flex-end"
+    >
       {toastMessage && (
         <Toast
           key={toastMessage.messageId}

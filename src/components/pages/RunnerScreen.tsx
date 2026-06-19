@@ -18,10 +18,17 @@ interface LogLine {
   timestamp: string;
 }
 
-export function RunnerScreen({ theme, profile, llamaServerBin, onExit }: RunnerScreenProps) {
+export function RunnerScreen({
+  theme,
+  profile,
+  llamaServerBin,
+  onExit,
+}: RunnerScreenProps) {
   const { stdout } = useStdout();
   const [lines, setLines] = useState<LogLine[]>([]);
-  const [status, setStatus] = useState<"starting" | "running" | "stopped" | "error">("starting");
+  const [status, setStatus] = useState<
+    "starting" | "running" | "stopped" | "error"
+  >("starting");
   const [exitCode, setExitCode] = useState<number | null>(null);
   const procRef = useRef<ChildProcess | null>(null);
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -30,17 +37,22 @@ export function RunnerScreen({ theme, profile, llamaServerBin, onExit }: RunnerS
   const termHeight = stdout?.rows ?? 24;
   const logHeight = Math.max(4, termHeight - 10);
 
-  const addLine = useCallback((text: string, isError: boolean) => {
-    const timestamp = new Date().toLocaleTimeString("en-US", { hour12: false });
-    setLines((prev) => {
-      const next = [...prev, { text, isError, timestamp }];
-      // Cap at 2000 lines
-      return next.length > 2000 ? next.slice(next.length - 2000) : next;
-    });
-    if (autoScroll) {
-      setScrollOffset((prev) => Math.max(0, prev + 1));
-    }
-  }, [autoScroll]);
+  const addLine = useCallback(
+    (text: string, isError: boolean) => {
+      const timestamp = new Date().toLocaleTimeString("en-US", {
+        hour12: false,
+      });
+      setLines((prev) => {
+        const next = [...prev, { text, isError, timestamp }];
+        // Cap at 2000 lines
+        return next.length > 2000 ? next.slice(next.length - 2000) : next;
+      });
+      if (autoScroll) {
+        setScrollOffset((prev) => Math.max(0, prev + 1));
+      }
+    },
+    [autoScroll]
+  );
 
   useEffect(() => {
     const args = buildLlamaArgs(profile);
@@ -80,7 +92,10 @@ export function RunnerScreen({ theme, profile, llamaServerBin, onExit }: RunnerS
         setStatus("error");
         addLine(`ERROR: ${err.message}`, true);
         if (err.message.includes("ENOENT")) {
-          addLine(`Could not find '${cmd}'. Make sure llama-server is in your PATH.`, true);
+          addLine(
+            `Could not find '${cmd}'. Make sure llama-server is in your PATH.`,
+            true
+          );
         }
       });
 
@@ -156,16 +171,22 @@ export function RunnerScreen({ theme, profile, llamaServerBin, onExit }: RunnerS
   }, [lines.length, autoScroll, logHeight]);
 
   const statusColor =
-    status === "running" ? theme.success :
-    status === "starting" ? theme.warning :
-    status === "error" ? theme.error :
-    theme.dim;
+    status === "running"
+      ? theme.success
+      : status === "starting"
+        ? theme.warning
+        : status === "error"
+          ? theme.error
+          : theme.dim;
 
   const statusLabel =
-    status === "running" ? `● RUNNING  ${profile.host}:${profile.port}` :
-    status === "starting" ? "◌ STARTING..." :
-    status === "error" ? `✗ ERROR (exit ${exitCode})` :
-    `■ STOPPED (exit ${exitCode})`;
+    status === "running"
+      ? `● RUNNING  ${profile.host}:${profile.port}`
+      : status === "starting"
+        ? "◌ STARTING..."
+        : status === "error"
+          ? `✗ ERROR (exit ${exitCode})`
+          : `■ STOPPED (exit ${exitCode})`;
 
   const visibleLines = lines.slice(scrollOffset, scrollOffset + logHeight);
 
@@ -173,10 +194,14 @@ export function RunnerScreen({ theme, profile, llamaServerBin, onExit }: RunnerS
     <Box flexDirection="column" flexGrow={1}>
       {/* Header */}
       <Box paddingX={1} gap={2} flexShrink={0}>
-        <Text color={theme.accent} bold>RUNNING:</Text>
+        <Text color={theme.accent} bold>
+          RUNNING:
+        </Text>
         <Text color={theme.fg}>{profile.name}</Text>
         <Text color={theme.dim}>|</Text>
-        <Text color={statusColor} bold>{statusLabel}</Text>
+        <Text color={statusColor} bold>
+          {statusLabel}
+        </Text>
         {!autoScroll && (
           <>
             <Text color={theme.dim}>|</Text>
@@ -195,7 +220,10 @@ export function RunnerScreen({ theme, profile, llamaServerBin, onExit }: RunnerS
           {visibleLines.map((line, i) => (
             <Box key={i}>
               <Text color={theme.dim}>{line.timestamp} </Text>
-              <Text color={line.isError ? theme.error : theme.fg} wrap="truncate">
+              <Text
+                color={line.isError ? theme.error : theme.fg}
+                wrap="truncate"
+              >
                 {line.text}
               </Text>
             </Box>

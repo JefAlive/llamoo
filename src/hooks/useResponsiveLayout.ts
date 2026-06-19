@@ -1,17 +1,17 @@
-import { useWindowSize } from 'ink';
-import { useMemo } from 'react';
+import { useWindowSize } from "ink";
+import { useMemo } from "react";
 
 const COLUMNS = {
-  "TINY": 38,
-  "MOBILE": 50,
-  "TABLET": 80,
-  "DESKTOP": 120,
-}
+  TINY: 38,
+  MOBILE: 50,
+  TABLET: 80,
+  DESKTOP: 120,
+};
 
 const ROWS = {
-  "SHORT": 35,
-  "SHORTEST": 25,
-}
+  SHORT: 35,
+  SHORTEST: 25,
+};
 
 export function useResponsiveLayout() {
   const { columns, rows } = useWindowSize();

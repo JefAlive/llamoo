@@ -1,11 +1,22 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { Box, Text, useInput, useStdout } from "ink";
 import TextInput from "ink-text-input";
-import type { Theme, LlamaProfile, GgufModel, AppScreen } from "../../types/index";
+import type {
+  Theme,
+  LlamaProfile,
+  GgufModel,
+  AppScreen,
+} from "../../types/index";
 import { Logo } from "../ui/Logo";
 import { formatBytes, formatTokens } from "../../utils/llama";
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
-import { petEvents, toast } from '../../utils/petEvents';
+import { petEvents, toast } from "../../utils/petEvents";
 import { AlertBox } from "../ui/AlertBox";
 import { SelectableList } from "../ui/SelectableList";
 import { PageLayout } from "../ui/PageLayout";
@@ -96,10 +107,22 @@ export function ProfilesScreen({
         setSelectedIdx(0);
         return;
       }
-      if (input === "t") { onChangeTheme(); return; }
-      if (input === "d") { onChangeDir(); return; }
-      if (input === "s") { onSyncModels(); return; }
-      if (input === "a") { onAddProfile(); return; }
+      if (input === "t") {
+        onChangeTheme();
+        return;
+      }
+      if (input === "d") {
+        onChangeDir();
+        return;
+      }
+      if (input === "s") {
+        onSyncModels();
+        return;
+      }
+      if (input === "a") {
+        onAddProfile();
+        return;
+      }
       if (input === "e" || key.return) {
         if (filteredProfiles[selectedIdx]) {
           onEditProfile(filteredProfiles[selectedIdx]);
@@ -142,75 +165,82 @@ export function ProfilesScreen({
     : undefined;
 
   const modelName = useMemo(() => {
-    if (!selected?.name) return '—';
+    if (!selected?.name) return "—";
 
-    const modelFilename = selected.modelPath.split("/").pop() || '—';
-    const modelName = modelFilename.replace(/.gguf$/gi, "")
+    const modelFilename = selected.modelPath.split("/").pop() || "—";
+    const modelName = modelFilename.replace(/.gguf$/gi, "");
 
     return modelName.replaceAll("-", " ");
-  }, [selectedModel])
+  }, [selectedModel]);
 
-  const visibleItems = filteredProfiles.slice(scrollOffset, scrollOffset + listHeight);
+  const visibleItems = filteredProfiles.slice(
+    scrollOffset,
+    scrollOffset + listHeight
+  );
 
   useEffect(() => {
     if (!petLoaded) {
       if (models.length === 0) {
         const messageId = toast(
-          WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
+          WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]
         );
 
         const handleWelcomeToastFinished = (finishedMessageId: string) => {
           if (finishedMessageId === messageId) {
             setIsAlertBlinking(true);
-            petEvents.off('toastFinished', handleWelcomeToastFinished);
+            petEvents.off("toastFinished", handleWelcomeToastFinished);
           }
-        }
+        };
 
-        petEvents.on('toastFinished', handleWelcomeToastFinished);
+        petEvents.on("toastFinished", handleWelcomeToastFinished);
       }
 
       if (models.length > 0 && profiles.length === 0) {
-        const messageId = toast('Crunch-crunch..\nA profile is a set of parameteres to run a model.\nUse [a] to create one.');
+        const messageId = toast(
+          "Crunch-crunch..\nA profile is a set of parameteres to run a model.\nUse [a] to create one."
+        );
 
-        const handleConfigureProfileToastFinished = (finishedMessageId: string) => {
+        const handleConfigureProfileToastFinished = (
+          finishedMessageId: string
+        ) => {
           if (finishedMessageId === messageId) {
             setIsAlertBlinking(true);
-            petEvents.off('toastFinished', handleConfigureProfileToastFinished);
+            petEvents.off("toastFinished", handleConfigureProfileToastFinished);
           }
-        }
+        };
 
-        petEvents.on('toastFinished', handleConfigureProfileToastFinished);
+        petEvents.on("toastFinished", handleConfigureProfileToastFinished);
       }
 
       if (models.length > 0 && profiles.length > 0) {
-        const messageId = toast('Yak!\nUse [e] to edit a profile.\nUse [r] to run a profile.');
+        const messageId = toast(
+          "Yak!\nUse [e] to edit a profile.\nUse [r] to run a profile."
+        );
 
         const handleEditProfileToastFinished = (finishedMessageId: string) => {
           if (finishedMessageId === messageId) {
             setIsAlertBlinking(true);
-            petEvents.off('toastFinished', handleEditProfileToastFinished);
+            petEvents.off("toastFinished", handleEditProfileToastFinished);
           }
-        }
+        };
 
-        petEvents.on('toastFinished', handleEditProfileToastFinished);
+        petEvents.on("toastFinished", handleEditProfileToastFinished);
       }
 
       setPetLoaded(true);
     }
-  }, [petRef])
+  }, [petRef]);
 
   return (
     <PageLayout
       theme={theme}
       hasBorder={profiles.length > 0}
-      header={
-        <Logo theme={theme} />
-      }
+      header={<Logo theme={theme} />}
       leftColumn={
         <Box flexDirection="column" gap={1}>
           <Box flexShrink={0}>
             <Text color={theme.dim} bold>
-              {'models'}
+              {"models"}
             </Text>
           </Box>
 
@@ -233,18 +263,22 @@ export function ProfilesScreen({
           {(models.length > 0 || profiles.length > 0) && (
             <Box>
               <Text color={theme.dim} bold>
-                {'profiles'}
+                {"profiles"}
               </Text>
               {(searching || searchQuery) && (
                 <>
-                  <Text color={theme.accent} bold={searching}>{".filter( /"}</Text>
+                  <Text color={theme.accent} bold={searching}>
+                    {".filter( /"}
+                  </Text>
                   <TextInput
                     value={searchQuery}
                     onChange={setSearchQuery}
                     onSubmit={() => setSearching(false)}
                     focus={searching}
                   />
-                  <Text color={theme.accent} bold={searching}>{"/ )"}</Text>
+                  <Text color={theme.accent} bold={searching}>
+                    {"/ )"}
+                  </Text>
                 </>
               )}
             </Box>
@@ -259,7 +293,7 @@ export function ProfilesScreen({
           )}
 
           <SelectableList
-            items={filteredProfiles.map(p => ({ id: p.id, label: p.name }))}
+            items={filteredProfiles.map((p) => ({ id: p.id, label: p.name }))}
             selectedIdx={selectedIdx}
             theme={theme}
             scrollOffset={scrollOffset}
@@ -302,29 +336,80 @@ export function ProfilesScreen({
               borderBottom={false}
               borderLeft={false}
             >
-              <DetailRow theme={theme} label="Context" value={`${formatTokens(selected.contextSize)} tokens`} />
-              <DetailRow theme={theme} label="GPU Layers" value={selected.gpuLayers === 0 ? "CPU only" : String(selected.gpuLayers)} />
-              <DetailRow theme={theme} label="Flash Attn" value={selected.flashAttention ? "yes" : "no"} accent={selected.flashAttention} />
-              <DetailRow theme={theme} label="KV Cache K/V" value={`${selected.kvCacheTypeK} / ${selected.kvCacheTypeV}`} />
-              <DetailRow theme={theme} label="Temperature" value={String(selected.temperature)} />
-              <DetailRow theme={theme} label="Top-K / Top-P" value={`${selected.topK} / ${selected.topP}`} />
-              <DetailRow theme={theme} label="Rep. Penalty" value={String(selected.repetitionPenalty)} />
+              <DetailRow
+                theme={theme}
+                label="Context"
+                value={`${formatTokens(selected.contextSize)} tokens`}
+              />
+              <DetailRow
+                theme={theme}
+                label="GPU Layers"
+                value={
+                  selected.gpuLayers === 0
+                    ? "CPU only"
+                    : String(selected.gpuLayers)
+                }
+              />
+              <DetailRow
+                theme={theme}
+                label="Flash Attn"
+                value={selected.flashAttention ? "yes" : "no"}
+                accent={selected.flashAttention}
+              />
+              <DetailRow
+                theme={theme}
+                label="KV Cache K/V"
+                value={`${selected.kvCacheTypeK} / ${selected.kvCacheTypeV}`}
+              />
+              <DetailRow
+                theme={theme}
+                label="Temperature"
+                value={String(selected.temperature)}
+              />
+              <DetailRow
+                theme={theme}
+                label="Top-K / Top-P"
+                value={`${selected.topK} / ${selected.topP}`}
+              />
+              <DetailRow
+                theme={theme}
+                label="Rep. Penalty"
+                value={String(selected.repetitionPenalty)}
+              />
               {selected.draftMax > 0 && (
-                <DetailRow theme={theme} label="Draft (MTP)" value={`min=${selected.draftMin} max=${selected.draftMax}`} accent />
+                <DetailRow
+                  theme={theme}
+                  label="Draft (MTP)"
+                  value={`min=${selected.draftMin} max=${selected.draftMax}`}
+                  accent
+                />
               )}
-              <DetailRow theme={theme} label="Server" value={`${selected.host}:${selected.port}`} />
+              <DetailRow
+                theme={theme}
+                label="Server"
+                value={`${selected.host}:${selected.port}`}
+              />
               {selected.loraPath && (
-                <DetailRow theme={theme} label="LoRA" value={selected.loraPath.split("/").pop() ?? ""} accent />
+                <DetailRow
+                  theme={theme}
+                  label="LoRA"
+                  value={selected.loraPath.split("/").pop() ?? ""}
+                  accent
+                />
               )}
               {selected.customFlags && (
-                <DetailRow theme={theme} label="Custom Flags" value={selected.customFlags} />
+                <DetailRow
+                  theme={theme}
+                  label="Custom Flags"
+                  value={selected.customFlags}
+                />
               )}
             </Box>
 
             {confirmDelete === selected.id && (
               <Box marginTop={1}>
                 <Text color={theme.error} bold>
-                  Delete "{selected.name}"? [y] yes  [any] cancel
+                  Delete "{selected.name}"? [y] yes [any] cancel
                 </Text>
               </Box>
             )}

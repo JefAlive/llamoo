@@ -1,7 +1,7 @@
-import React from 'react';
-import { Box, Text } from 'ink';
-import { BreathingText } from './BreathingText';
-import chalk from 'chalk';
+import React from "react";
+import { Box, Text } from "ink";
+import { BreathingText } from "./BreathingText";
+import chalk from "chalk";
 
 interface SelectableItemData {
   id: string | number;
@@ -23,9 +23,8 @@ export function SelectableList({
   theme,
   scrollOffset = 0,
   listHeight,
-  emptyMessage = "No results for your search."
+  emptyMessage = "No results for your search.",
 }: SelectableListProps) {
-
   if (items.length === 0) {
     return (
       <Box>
@@ -34,8 +33,8 @@ export function SelectableList({
     );
   }
 
-  const visibleItems = listHeight 
-    ? items.slice(scrollOffset, scrollOffset + listHeight) 
+  const visibleItems = listHeight
+    ? items.slice(scrollOffset, scrollOffset + listHeight)
     : items;
 
   return (
@@ -51,9 +50,13 @@ export function SelectableList({
                 {isSelected ? chalk.bold(">") : " "}
               </BreathingText>
             </Box>
-            
+
             <Box height={1}>
-              <Text color={isSelected ? theme.accent : theme.fg} bold={isSelected} wrap="truncate-middle">
+              <Text
+                color={isSelected ? theme.accent : theme.fg}
+                bold={isSelected}
+                wrap="truncate-middle"
+              >
                 {item.label}
               </Text>
             </Box>

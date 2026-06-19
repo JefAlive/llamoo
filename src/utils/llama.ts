@@ -45,7 +45,7 @@ export function formatTokens(bytes: number): string {
   const k = 1024;
   const sizes = ["", "K", "M", "B", "T"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${Math.ceil((bytes / Math.pow(k, i))).toFixed(0)}${sizes[i]}`;
+  return `${Math.ceil(bytes / Math.pow(k, i)).toFixed(0)}${sizes[i]}`;
 }
 
 export function buildLlamaArgs(profile: LlamaProfile): string[] {

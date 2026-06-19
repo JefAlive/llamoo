@@ -52,7 +52,7 @@ function mixBetween(a: number, b: number, t: number) {
 function mixColor(
   fg: [number, number, number],
   bg: [number, number, number],
-  t: number,
+  t: number
 ) {
   // 🎯 FG respira entre BG → FG
   return {

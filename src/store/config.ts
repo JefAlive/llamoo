@@ -63,7 +63,10 @@ export function setModels(models: GgufModel[]): void {
   conf.set("models", models);
 }
 
-export function makeDefaultProfile(modelPath: string, modelName: string): LlamaProfile {
+export function makeDefaultProfile(
+  modelPath: string,
+  modelName: string
+): LlamaProfile {
   return {
     id: nanoid(),
     name: `Profile - ${modelName}`,

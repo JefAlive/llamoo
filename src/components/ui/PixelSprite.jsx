@@ -1,5 +1,5 @@
-import { Box, Text } from 'ink';
-import { useEffect, useState } from 'react';
+import { Box, Text } from "ink";
+import { useEffect, useState } from "react";
 
 const LLAMA_ASCII = `
 (\\_/)
@@ -29,15 +29,18 @@ export function PixelSprite({ width, height, assetId, theme }) {
         const doBlink = (callback) => {
           setBlinking(true);
 
-          setTimeout(() => {
-            setBlinking(false);
+          setTimeout(
+            () => {
+              setBlinking(false);
 
-            if (callback) {
-              callback();
-            } else {
-              scheduleBlink();
-            }
-          }, doubleBlink ? 180 : 350); // olho fechado
+              if (callback) {
+                callback();
+              } else {
+                scheduleBlink();
+              }
+            },
+            doubleBlink ? 180 : 350
+          ); // olho fechado
         };
 
         if (doubleBlink) {
@@ -60,7 +63,7 @@ export function PixelSprite({ width, height, assetId, theme }) {
   }, []);
 
   const b = assetId & 0xff;
-  const hexColor = '#0000' + b.toString(16).padStart(2, '0');
+  const hexColor = "#0000" + b.toString(16).padStart(2, "0");
 
   const hasImageSupport = false;
 

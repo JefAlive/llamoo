@@ -1,26 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-import GraphemeSplitter from 'grapheme-splitter';
-import { Box, Text } from 'ink';
+import GraphemeSplitter from "grapheme-splitter";
+import { Box, Text } from "ink";
 
 const splitter = new GraphemeSplitter();
 
-const CURSOR = '▂';
+const CURSOR = "▂";
 
 const PHASES = {
-  TYPING: 'typing',
-  VISIBLE: 'visible',
-  DELETING: 'deleting',
-  HIDDEN: 'hidden',
+  TYPING: "typing",
+  VISIBLE: "visible",
+  DELETING: "deleting",
+  HIDDEN: "hidden",
 };
 
 function getTypingDelay(char) {
-  if (char === '.') return 1000;
-  if (char === '!') return 1500;
-  if (char === '?') return 750;
-  if (char === ',') return 160;
-  if (char === ' ') return 0;
-  if (char === '\n') return 0;
+  if (char === ".") return 1000;
+  if (char === "!") return 1500;
+  if (char === "?") return 750;
+  if (char === ",") return 160;
+  if (char === " ") return 0;
+  if (char === "\n") return 0;
 
   const hesitation = Math.random() < 0.12;
 
@@ -119,7 +119,7 @@ function TypewriterText({
           return Math.max(next, 0);
         });
       },
-      8 + Math.random() * 4,
+      8 + Math.random() * 4
     );
 
     return () => clearTimeout(timeout);
@@ -127,13 +127,13 @@ function TypewriterText({
 
   const content = useMemo(() => {
     if (phase === PHASES.HIDDEN) {
-      return '';
+      return "";
     }
 
-    const visible = glyphs.slice(0, index).join('');
+    const visible = glyphs.slice(0, index).join("");
 
     if (phase === PHASES.TYPING && index < glyphs.length) {
-      return visible + (cursorVisible ? CURSOR : '_');
+      return visible + (cursorVisible ? CURSOR : "_");
     }
 
     return visible;
@@ -143,43 +143,45 @@ function TypewriterText({
 }
 
 export function Toast({ theme, message, onFinish }) {
-  return message && (
-    <Box flexDirection="row" justifyContent="flex-end" alignItems="flex-end">
-      <Box flexDirection="column" justifyContent="flex-end">
-        <Box
-          paddingRight={2}
-          flexDirection="column"
-          justifyContent="center"
-          backgroundColor={theme.fg}
-          borderStyle={{
-            topLeft: '▌',
-            top: '',
-            topRight: '▐',
-            left: '▌',
-            bottomLeft: '▌',
-            bottom: '',
-            bottomRight: '▐',
-            right: '▐',
-          }}
-          borderTop={false}
-          borderRight={true}
-          borderBottom={false}
-          borderLeft={true}
-          borderBackgroundColor={theme.fg}
-          borderColor={theme.accent}
-        >
-          <TypewriterText
-            color={theme.bg}
-            text={message}
-            visibleDuration={5000}
-            onFinish={onFinish}
-          />
+  return (
+    message && (
+      <Box flexDirection="row" justifyContent="flex-end" alignItems="flex-end">
+        <Box flexDirection="column" justifyContent="flex-end">
+          <Box
+            paddingRight={2}
+            flexDirection="column"
+            justifyContent="center"
+            backgroundColor={theme.fg}
+            borderStyle={{
+              topLeft: "▌",
+              top: "",
+              topRight: "▐",
+              left: "▌",
+              bottomLeft: "▌",
+              bottom: "",
+              bottomRight: "▐",
+              right: "▐",
+            }}
+            borderTop={false}
+            borderRight={true}
+            borderBottom={false}
+            borderLeft={true}
+            borderBackgroundColor={theme.fg}
+            borderColor={theme.accent}
+          >
+            <TypewriterText
+              color={theme.bg}
+              text={message}
+              visibleDuration={5000}
+              onFinish={onFinish}
+            />
+          </Box>
+        </Box>
+
+        <Box>
+          <Text color={theme.accent}>▶</Text>
         </Box>
       </Box>
-
-      <Box>
-        <Text color={theme.accent}>▶</Text>
-      </Box>
-    </Box>
+    )
   );
 }

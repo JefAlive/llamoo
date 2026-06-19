@@ -14,14 +14,14 @@ export function AlertBox({ message, blinking = false, theme }: AlertBoxProps) {
       flexDirection="column"
       paddingLeft={1}
       borderStyle={{
-        topLeft: '',
-        top: '',
-        topRight: '',
-        left: '▌',
-        bottomLeft: '',
-        bottom: '',
-        bottomRight: '',
-        right: '▐',
+        topLeft: "",
+        top: "",
+        topRight: "",
+        left: "▌",
+        bottomLeft: "",
+        bottom: "",
+        bottomRight: "",
+        right: "▐",
       }}
       borderColor={theme.warning}
       borderTop={false}
@@ -30,9 +30,14 @@ export function AlertBox({ message, blinking = false, theme }: AlertBoxProps) {
       borderBackgroundColor={theme.bg}
       backgroundColor={theme.bg}
     >
-      <BreathingText active={blinking} speed={0.1} fg={theme.warning} bg={theme.bg}>
+      <BreathingText
+        active={blinking}
+        speed={0.1}
+        fg={theme.warning}
+        bg={theme.bg}
+      >
         {message}
       </BreathingText>
     </Box>
-  )
+  );
 }
