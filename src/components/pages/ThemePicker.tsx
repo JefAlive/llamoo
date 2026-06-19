@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import { Box, Text, useInput } from "ink";
 import { useState } from "react";
-import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import { themes } from "../../themes/index";
 import type { Theme, ThemeName } from "../../types/index";
 import { PageLayout } from "../ui/PageLayout";
@@ -17,13 +16,10 @@ interface ThemePickerProps {
 }
 
 export function ThemePicker({
-  theme,
   currentTheme,
   onSelect,
   onCancel,
 }: ThemePickerProps) {
-  const { maxContainerColumns } = useResponsiveLayout();
-
   const [idx, setIdx] = useState(THEME_NAMES.indexOf(currentTheme));
 
   useInput((input, key) => {

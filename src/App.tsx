@@ -1,4 +1,4 @@
-import { Box, useApp, useWindowSize } from "ink";
+import { Box, useWindowSize } from "ink";
 import { useCallback, useState } from "react";
 import { DirManager } from "./components/pages/DirManager";
 import { ProfileEditor } from "./components/pages/ProfileEditor";
@@ -34,7 +34,6 @@ function findLlamaServer(): string {
 }
 
 export function App() {
-  const { exit } = useApp();
   const { rows } = useWindowSize();
 
   const [screen, setScreen] = useState<AppScreen>("profiles");

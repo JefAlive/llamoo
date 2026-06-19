@@ -115,7 +115,7 @@ export function RunnerScreen({
         procRef.current.kill("SIGTERM");
       }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useInput((input, key) => {
     if (input === "q" || key.escape) {

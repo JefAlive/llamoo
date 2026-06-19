@@ -1,7 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
 import { useState } from "react";
-import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import type { Theme } from "../../types/index";
 import { PageLayout } from "../ui/PageLayout";
 import { SelectableList } from "../ui/SelectableList";
@@ -14,8 +13,6 @@ interface DirManagerProps {
 }
 
 export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
-  const { maxContainerColumns } = useResponsiveLayout();
-
   const [list, setList] = useState<string[]>([...dirs]);
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [adding, setAdding] = useState(false);

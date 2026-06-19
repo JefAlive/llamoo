@@ -17,7 +17,9 @@ export function scanForModels(dirs: string[]): GgufModel[] {
           let sizeBytes = 0;
           try {
             sizeBytes = fs.statSync(fullPath).size;
-          } catch {}
+          } catch (e) {
+            console.error(e);
+          }
           models.push({
             name: entry.name,
             path: fullPath,
@@ -26,7 +28,9 @@ export function scanForModels(dirs: string[]): GgufModel[] {
           });
         }
       }
-    } catch {}
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return models.sort((a, b) => a.name.localeCompare(b.name));

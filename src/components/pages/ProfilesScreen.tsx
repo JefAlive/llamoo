@@ -1,7 +1,6 @@
 import { Box, Text, useInput, useStdout } from "ink";
 import TextInput from "ink-text-input";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import type {
   AppScreen,
   GgufModel,
@@ -37,7 +36,6 @@ export function ProfilesScreen({
   theme,
   profiles,
   models,
-  onNavigate,
   onDeleteProfile,
   onAddProfile,
   onEditProfile,
@@ -47,7 +45,6 @@ export function ProfilesScreen({
   onSyncModels,
 }: ProfilesScreenProps) {
   const { stdout } = useStdout();
-  const { isDesktop, maxContainerColumns } = useResponsiveLayout();
 
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [searching, setSearching] = useState(false);
@@ -166,11 +163,6 @@ export function ProfilesScreen({
 
     return modelName.replaceAll("-", " ");
   }, [selectedModel]);
-
-  const visibleItems = filteredProfiles.slice(
-    scrollOffset,
-    scrollOffset + listHeight
-  );
 
   useEffect(() => {
     if (!petLoaded) {

@@ -1,7 +1,6 @@
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
 import { useCallback, useState } from "react";
-import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import type { GgufModel, LlamaProfile, Theme } from "../../types/index";
 import { PageLayout } from "../ui/PageLayout";
 import { SelectableList } from "../ui/SelectableList";
@@ -295,8 +294,6 @@ export function ProfileEditor({
   onSave,
   onCancel,
 }: ProfileEditorProps) {
-  const { maxContainerColumns } = useResponsiveLayout();
-
   const [draft, setDraft] = useState<LlamaProfile>({ ...profile });
   const [fieldIdx, setFieldIdx] = useState(0);
   const [editing, setEditing] = useState(false);
