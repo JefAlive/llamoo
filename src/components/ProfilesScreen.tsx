@@ -11,6 +11,7 @@ import { Pet } from './ui/Pet';
 import { BreathingText } from "./ui/BreathingText";
 import { AlertBox } from "./ui/AlertBox";
 import { SelectableList } from "./ui/SelectableList";
+import { PageLayout } from "./ui/PageLayout";
 
 interface ProfilesScreenProps {
   theme: Theme;
@@ -202,196 +203,149 @@ export function ProfilesScreen({
   }, [petRef])
 
   return (
-    <Box flexDirection="column" flexGrow={1} alignItems="center" backgroundColor={theme.bg}>
-      <Box
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="space-around"
-        position="relative"
-        width={maxContainerColumns}
-        flexGrow={1}
-        paddingY={1}
-        gap={1}
-      >
-        {/* Main content */}
-        <Box flexShrink={0}>
-          <Logo theme={theme} />
-        </Box>
+    <PageLayout
+      theme={theme}
+      hasBorder={profiles.length > 0}
+      header={
+        <Logo theme={theme} />
+      }
+      leftColumn={
+        <Box flexDirection="column" gap={1}>
+          <Box flexShrink={0}>
+            <Text color={theme.dim} bold>
+              {'models'}
+            </Text>
+          </Box>
 
-        <Box flexDirection="row" justifyContent="center" alignItems="center" gap={2} flexShrink={1}>
-          {/* Left: profile list */}
-          <Box
-            flexDirection="column"
-            width={Math.floor(maxContainerColumns * (isDesktop ? 0.6 : 0.5))}
-            height="100%"
-            justifyContent="flex-start"
-            gap={1}
-          >
-            <Box flexShrink={0}>
-              <Text color={theme.dim} bold>
-                {'models'}
+          {models.length === 0 && (
+            <AlertBox
+              message="No models found. Press [d] to configure your model directory."
+              theme={theme}
+              blinking={isAlertBlinking}
+            />
+          )}
+
+          {models.length > 0 && (
+            <Box paddingLeft={2}>
+              <Text color={theme.fg}>
+                {`${models.length} ${models.length === 1 ? "model" : "models"} detected`}
               </Text>
             </Box>
+          )}
 
-            {models.length === 0 && (
-              <AlertBox
-                message="No models found. Press [d] to configure your model directory."
-                theme={theme}
-                blinking={isAlertBlinking}
-              />
-            )}
-
-            {models.length > 0 && (
-              <Box paddingLeft={2}>
-                <Text color={theme.fg}>
-                  {`${models.length} ${models.length === 1 ? "model" : "models"} detected`}
-                </Text>
-              </Box>
-            )}
-
-            {(models.length > 0 || profiles.length > 0) && (
-              <Box>
-                <Text color={theme.dim} bold>
-                  {'profiles'}
-                </Text>
-                {(searching || searchQuery) && (
-                  <>
-                    <Text color={theme.accent} bold={searching}>{".filter( /"}</Text>
-                    <TextInput
-                      value={searchQuery}
-                      onChange={setSearchQuery}
-                      onSubmit={() => setSearching(false)}
-                      focus={searching}
-                    />
-                    <Text color={theme.accent} bold={searching}>{"/ )"}</Text>
-                  </>
-                )}
-              </Box>
-            )}
-
-            {models.length > 0 && profiles.length === 0 && (
-              <AlertBox
-                message="Press [a] to add a profile."
-                theme={theme}
-                blinking={isAlertBlinking}
-              />
-            )}
-
-            <SelectableList
-              items={filteredProfiles.map(p => ({ id: p.id, label: p.name }))}
-              selectedIdx={selectedIdx}
-              theme={theme}
-              scrollOffset={scrollOffset}
-              listHeight={listHeight}
-            />
-          </Box>
-
-          {/* Right: profile details */}
-          <Box
-            flexDirection="column"
-            width={Math.floor(maxContainerColumns * (isDesktop ? 0.4 : 0.5))}
-            height="100%"
-            borderStyle={profiles.length === 0 ? undefined : "round"}
-            borderColor={theme.border}
-            borderBackgroundColor={theme.bg}
-            paddingX={2}
-            paddingY={1}
-          >
-            {selected && (
-              <Box flexDirection="column">
-                <Box>
-                  <Box flexShrink={0}>
-                    <Text color={theme.dim}>Model: </Text>
-                  </Box>
-                  <Box flexShrink={1}>
-                    <Text color={theme.fg} bold>
-                      {modelName}
-                    </Text>
-                  </Box>
-                </Box>
-                <Box>
-                  <Box flexShrink={0}>
-                    <Text color={theme.dim}>Size: </Text>
-                  </Box>
-                  <Box flexShrink={1}>
-                    <Text color={theme.fg} bold>
-                      {formatBytes(selectedModel?.sizeBytes || 0)}
-                    </Text>
-                  </Box>
-                </Box>
-
-                <Box
-                  flexDirection="column"
-                  gap={0}
-                  borderStyle="round"
-                  borderColor={theme.border}
-                  borderBackgroundColor={theme.bg}
-                  borderTop={true}
-                  borderRight={false}
-                  borderBottom={false}
-                  borderLeft={false}
-                >
-                  <DetailRow theme={theme} label="Context" value={`${formatTokens(selected.contextSize)} tokens`} />
-                  <DetailRow theme={theme} label="GPU Layers" value={selected.gpuLayers === 0 ? "CPU only" : String(selected.gpuLayers)} />
-                  <DetailRow theme={theme} label="Flash Attn" value={selected.flashAttention ? "yes" : "no"} accent={selected.flashAttention} />
-                  <DetailRow theme={theme} label="KV Cache K/V" value={`${selected.kvCacheTypeK} / ${selected.kvCacheTypeV}`} />
-                  <DetailRow theme={theme} label="Temperature" value={String(selected.temperature)} />
-                  <DetailRow theme={theme} label="Top-K / Top-P" value={`${selected.topK} / ${selected.topP}`} />
-                  <DetailRow theme={theme} label="Rep. Penalty" value={String(selected.repetitionPenalty)} />
-                  {selected.draftMax > 0 && (
-                    <DetailRow theme={theme} label="Draft (MTP)" value={`min=${selected.draftMin} max=${selected.draftMax}`} accent />
-                  )}
-                  <DetailRow theme={theme} label="Server" value={`${selected.host}:${selected.port}`} />
-                  {selected.loraPath && (
-                    <DetailRow theme={theme} label="LoRA" value={selected.loraPath.split("/").pop() ?? ""} accent />
-                  )}
-                  {selected.customFlags && (
-                    <DetailRow theme={theme} label="Custom Flags" value={selected.customFlags} />
-                  )}
-                </Box>
-
-                {confirmDelete === selected.id && (
-                  <Box marginTop={1}>
-                    <Text color={theme.error} bold>
-                      Delete "{selected.name}"? [y] yes  [any] cancel
-                    </Text>
-                  </Box>
-                )}
-              </Box>
-            )}
-          </Box>
-
-          <Box
-            position="absolute"
-            bottom={-1}
-            right={-4}
-            width={Math.floor(maxContainerColumns * 0.5)}
-            justifyContent="flex-end"
-            alignItems="flex-end"
-          >
-            <Box justifyContent="flex-end" paddingX={2}>
-              <Pet ref={petRef} theme={theme} />
+          {(models.length > 0 || profiles.length > 0) && (
+            <Box>
+              <Text color={theme.dim} bold>
+                {'profiles'}
+              </Text>
+              {(searching || searchQuery) && (
+                <>
+                  <Text color={theme.accent} bold={searching}>{".filter( /"}</Text>
+                  <TextInput
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    onSubmit={() => setSearching(false)}
+                    focus={searching}
+                  />
+                  <Text color={theme.accent} bold={searching}>{"/ )"}</Text>
+                </>
+              )}
             </Box>
-          </Box>
-        </Box>
-      </Box>
+          )}
 
-      {/* Hint bar */}
-      <HintBar
-        theme={theme}
-        hints={[
-          { key: "↑↓", desc: "navigate" },
-          { key: "a", desc: "add" },
-          { key: "e/↵", desc: "edit" },
-          { key: "r", desc: "run" },
-          { key: "x", desc: "delete" },
-          { key: "/", desc: "search" },
-          { key: "t", desc: "theme" },
-          { key: "d", desc: "dirs" },
-          { key: "s", desc: "sync" },
-        ]}
-      />
-    </Box>
+          {models.length > 0 && profiles.length === 0 && (
+            <AlertBox
+              message="Press [a] to add a profile."
+              theme={theme}
+              blinking={isAlertBlinking}
+            />
+          )}
+
+          <SelectableList
+            items={filteredProfiles.map(p => ({ id: p.id, label: p.name }))}
+            selectedIdx={selectedIdx}
+            theme={theme}
+            scrollOffset={scrollOffset}
+            listHeight={listHeight}
+          />
+        </Box>
+      }
+      rightColumn={
+        selected && (
+          <Box flexDirection="column">
+            <Box>
+              <Box flexShrink={0}>
+                <Text color={theme.dim}>Model: </Text>
+              </Box>
+              <Box flexShrink={1}>
+                <Text color={theme.fg} bold>
+                  {modelName}
+                </Text>
+              </Box>
+            </Box>
+            <Box>
+              <Box flexShrink={0}>
+                <Text color={theme.dim}>Size: </Text>
+              </Box>
+              <Box flexShrink={1}>
+                <Text color={theme.fg} bold>
+                  {formatBytes(selectedModel?.sizeBytes || 0)}
+                </Text>
+              </Box>
+            </Box>
+
+            <Box
+              flexDirection="column"
+              gap={0}
+              borderStyle="round"
+              borderColor={theme.border}
+              borderBackgroundColor={theme.bg}
+              borderTop={true}
+              borderRight={false}
+              borderBottom={false}
+              borderLeft={false}
+            >
+              <DetailRow theme={theme} label="Context" value={`${formatTokens(selected.contextSize)} tokens`} />
+              <DetailRow theme={theme} label="GPU Layers" value={selected.gpuLayers === 0 ? "CPU only" : String(selected.gpuLayers)} />
+              <DetailRow theme={theme} label="Flash Attn" value={selected.flashAttention ? "yes" : "no"} accent={selected.flashAttention} />
+              <DetailRow theme={theme} label="KV Cache K/V" value={`${selected.kvCacheTypeK} / ${selected.kvCacheTypeV}`} />
+              <DetailRow theme={theme} label="Temperature" value={String(selected.temperature)} />
+              <DetailRow theme={theme} label="Top-K / Top-P" value={`${selected.topK} / ${selected.topP}`} />
+              <DetailRow theme={theme} label="Rep. Penalty" value={String(selected.repetitionPenalty)} />
+              {selected.draftMax > 0 && (
+                <DetailRow theme={theme} label="Draft (MTP)" value={`min=${selected.draftMin} max=${selected.draftMax}`} accent />
+              )}
+              <DetailRow theme={theme} label="Server" value={`${selected.host}:${selected.port}`} />
+              {selected.loraPath && (
+                <DetailRow theme={theme} label="LoRA" value={selected.loraPath.split("/").pop() ?? ""} accent />
+              )}
+              {selected.customFlags && (
+                <DetailRow theme={theme} label="Custom Flags" value={selected.customFlags} />
+              )}
+            </Box>
+
+            {confirmDelete === selected.id && (
+              <Box marginTop={1}>
+                <Text color={theme.error} bold>
+                  Delete "{selected.name}"? [y] yes  [any] cancel
+                </Text>
+              </Box>
+            )}
+          </Box>
+        )
+      }
+      hints={[
+        { key: "↑↓", desc: "navigate" },
+        { key: "a", desc: "add" },
+        { key: "e/↵", desc: "edit" },
+        { key: "r", desc: "run" },
+        { key: "x", desc: "delete" },
+        { key: "/", desc: "search" },
+        { key: "t", desc: "theme" },
+        { key: "d", desc: "dirs" },
+        { key: "s", desc: "sync" },
+      ]}
+    />
   );
 }
 
