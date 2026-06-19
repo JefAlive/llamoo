@@ -2,9 +2,9 @@ import React, { useState, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
 import TextInput from "ink-text-input";
 import type { Theme, LlamaProfile, GgufModel } from "../types/index";
-import { ThemedBox } from "./ThemedBox";
-import { HintBar } from "./StatusBar";
 import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
+import { PageLayout } from "./ui/PageLayout";
+import { SelectableList } from "./ui/SelectableList";
 
 interface ProfileEditorProps {
   theme: Theme;
@@ -214,130 +214,145 @@ export function ProfileEditor({
 
   if (modelPickerOpen) {
     return (
-      <ThemedBox theme={theme} title="SELECT MODEL" flexDirection="column" focused>
-        {models.length === 0 ? (
-          <Text color={theme.warning}>No models found. Add scan directories first.</Text>
-        ) : (
-          models.map((m, i) => (
-            <Box key={m.path}>
-              {i === modelPickerIdx ? (
-                <Text color={theme.highlightFg} backgroundColor={theme.highlight} bold>
-                  {` ▶ ${m.name}`.padEnd(60)}
-                </Text>
-              ) : (
-                <Text color={theme.fg}>{"   " + m.name}</Text>
-              )}
+      <PageLayout
+        theme={theme}
+        hasBorder={true}
+        leftColumn={
+          <Box flexDirection="column">
+            <Box marginBottom={1}>
+              <Text color={theme.dim} bold>
+                select model
+              </Text>
             </Box>
-          ))
-        )}
-        <Box marginTop={1}>
-          <Text color={theme.dim}>↑↓ navigate  ↵ select  ESC cancel</Text>
-        </Box>
-      </ThemedBox>
+
+            {models.length === 0 ? (
+              <Text color={theme.warning}>No models found. Add scan directories first.</Text>
+            ) : (
+              <SelectableList
+                items={models.map((m) => ({ id: m.path, label: m.name }))}
+                selectedIdx={modelPickerIdx}
+                theme={theme}
+              />
+            )}
+          </Box>
+        }
+        rightColumn={
+          <></>
+        }
+        hints={[
+          { key: "↑↓", desc: "navigate" },
+          { key: "↵", desc: "select" },
+          { key: "ESC", desc: "cancel" }
+        ]}
+      />
     );
   }
 
   return (
-    <Box flexDirection="column" flexGrow={1} alignItems="center" backgroundColor={theme.bg}>
-      <Box
-        flexDirection="row"
-        width={maxContainerColumns}
-        flexGrow={1}
-        gap={1}
-      >
-        {/* Fields list */}
-        <ThemedBox theme={theme} title={`EDIT: ${draft.name}`} width={52} flexDirection="column" focused>
+    <PageLayout
+      theme={theme}
+      hasBorder={true}
+      leftColumn={
+        <Box flexDirection="column" gap={0}>
+          <Box width="100%" marginBottom={1}>
+            <Text color={theme.dim} bold>
+              profile editor
+            </Text>
+          </Box>
+
           {visibleFields.map((field, i) => {
             const realIdx = i + scrollOffset;
             const isSelected = realIdx === fieldIdx;
-            const val = getVal(field);
-            const isModel = field.type === "model";
-            const displayVal = isModel
-              ? (draft.modelPath ? draft.modelPath.split("/").pop() ?? "—" : "(none)")
-              : val;
-            const isBool = field.type === "bool";
-            const boolColor = val === "true" ? theme.success : theme.dim;
+            const valStr = getVal(field);
 
             return (
               <Box key={field.key} gap={1}>
-                {isSelected ? (
-                  <>
-                    <Text color={theme.accent} bold>{"▶"}</Text>
-                    <Text color={theme.accent} bold>{field.label.padEnd(22)}</Text>
-                    {editing ? (
-                      <Box>
-                        <TextInput
-                          value={editVal}
-                          onChange={setEditVal}
-                          focus={true}
-                        />
-                      </Box>
-                    ) : (
-                      <Text color={isBool ? boolColor : theme.highlight} bold>
-                        {displayVal || "(empty)"}
-                      </Text>
-                    )}
-                  </>
+                <Text color={isSelected ? theme.accent : theme.fg} bold={isSelected}>
+                  {isSelected ? "> " : "  "}
+                  {field.label.padEnd(22)}
+                </Text>
+                
+                {isSelected && editing && field.type !== "bool" && field.type !== "select" ? (
+                  <Box gap={1}>
+                    <Text color={theme.accent}>[</Text>
+                    <TextInput
+                      value={editVal}
+                      onChange={setEditVal}
+                      focus={true}
+                    />
+                    <Text color={theme.accent}>]</Text>
+                  </Box>
                 ) : (
-                  <>
-                    <Text color={theme.dim}>{"  "}</Text>
-                    <Text color={theme.dim}>{field.label.padEnd(22)}</Text>
-                    <Text color={isBool ? (val === "true" ? theme.success : theme.dim) : theme.fg}>
-                      {displayVal || "(empty)"}
-                    </Text>
-                  </>
+                  <Text color={isSelected ? theme.accent : theme.dim}>
+                    {valStr || "—"}
+                  </Text>
                 )}
               </Box>
             );
           })}
-          <Text color={theme.dim}>
-            {`  ${fieldIdx + 1}/${FIELDS.length}`}
-          </Text>
-        </ThemedBox>
-
-        {/* Description panel */}
-        <ThemedBox theme={theme} title="HELP" flexGrow={1} flexDirection="column" dimBorder>
-          {currentField && (
-            <Box flexDirection="column" gap={1}>
-              <Text color={theme.accent} bold>{currentField.label}</Text>
-              <Text color={theme.fg}>{currentField.desc}</Text>
-
-              {currentField.type === "number" && (
-                <Box flexDirection="column" marginTop={1}>
-                  <Text color={theme.dim}>← → adjust by {(currentField as any).step ?? 1}</Text>
-                  <Text color={theme.dim}>↵ type value directly</Text>
+        </Box>
+      }
+      rightColumn={
+        <Box flexDirection="column" flexGrow={1} height="100%">
+          {modelPickerOpen ? (
+            <Box flexDirection="column" flexGrow={1}>
+              <Box marginBottom={1}>
+                <Text color={theme.accent} bold>Select .gguf model:</Text>
+              </Box>
+              {models.length === 0 ? (
+                <Text color={theme.warning}>No models found. Sync directories first.</Text>
+              ) : (
+                <SelectableList
+                  items={models.map((m, i) => ({ id: i, label: m.name }))}
+                  selectedIdx={modelPickerIdx}
+                  theme={theme}
+                />
+              )}
+            </Box>
+          ) : (
+            <Box flexDirection="column" justifyContent="space-between" flexGrow={1} height="100%">
+              <Box flexDirection="column" gap={1}>
+                <Text color={theme.accent} bold>
+                  {currentField?.label}
+                </Text>
+                <Text color={theme.fg}>
+                  {currentField?.desc}
+                </Text>
+                <Box marginTop={1} flexDirection="column">
+                  <Text color={theme.dim}>Type: <Text color={theme.fg}>{currentField?.type}</Text></Text>
+                  <Text color={theme.dim}>Current value: <Text color={theme.fg}>{getVal(currentField)}</Text></Text>
                 </Box>
-              )}
-              {currentField.type === "bool" && (
-                <Text color={theme.dim} marginTop={1}>↵ or SPACE to toggle</Text>
-              )}
-              {currentField.type === "select" && (
-                <Box flexDirection="column" marginTop={1}>
-                  <Text color={theme.dim}>← → or ↵ to cycle options</Text>
-                  <Text color={theme.dim}>Options: {(currentField as any).options.join(", ")}</Text>
+              </Box>
+
+              {editing && (currentField?.type === "bool" || currentField?.type === "select") && (
+                <Box flexDirection="column" borderStyle="classic" borderColor={theme.accent} paddingX={1} marginTop={1}>
+                  <Text color={theme.accent} bold>Use Left/Right arrows to cycle options</Text>
                 </Box>
-              )}
-              {currentField.type === "model" && (
-                <Text color={theme.dim} marginTop={1}>↵ to open model picker</Text>
-              )}
-              {currentField.type === "text" && (
-                <Text color={theme.dim} marginTop={1}>↵ to edit text  ESC to cancel edit</Text>
               )}
             </Box>
           )}
-        </ThemedBox>
-      </Box>
-
-      <HintBar
-        theme={theme}
-        hints={[
-          { key: "↑↓", desc: "navigate" },
-          { key: "↵/SPACE", desc: "edit/toggle" },
-          { key: "←→", desc: "adjust" },
-          { key: "Ctrl+S", desc: "save" },
-          { key: "ESC", desc: "cancel" },
-        ]}
-      />
-    </Box>
+        </Box>
+      }
+      hints={[
+        ...(modelPickerOpen 
+          ? [
+              { key: "↑↓", desc: "browse models" },
+              { key: "↵", desc: "select model" },
+              { key: "ESC", desc: "back to form" }
+            ]
+          : editing
+          ? [
+              { key: "↵", desc: "confirm value" },
+              { key: "ESC", desc: "cancel editing" }
+            ]
+          : [
+              { key: "↑↓", desc: "navigate" },
+              { key: "↵/e/Space", desc: "edit field" },
+              { key: "Ctrl+S", desc: "save profile" },
+              { key: "ESC", desc: "cancel" }
+            ]
+        )
+      ]}
+    />
   );
 }

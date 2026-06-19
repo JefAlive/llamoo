@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Box, Newline, Text, useInput } from "ink";
 import type { Theme, ThemeName } from "../types/index";
 import { themes } from "../themes/index";
-import { ThemedBox } from "./ThemedBox";
 import { HintBar } from "./StatusBar";
 import { useResponsiveLayout } from "../hooks/useResponsiveLayout";
 import { SelectableList } from "./ui/SelectableList";

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Box, Text, useInput, useStdout } from "ink";
 import { spawn, ChildProcess } from "child_process";
 import type { Theme, LlamaProfile } from "../types/index";
-import { ThemedBox } from "./ThemedBox";
 import { HintBar } from "./StatusBar";
 import { buildLlamaArgs } from "../utils/llama";
 
@@ -187,7 +186,11 @@ export function RunnerScreen({ theme, profile, llamaServerBin, onExit }: RunnerS
       </Box>
 
       {/* Log area */}
-      <ThemedBox theme={theme} title="OUTPUT" flexGrow={1} flexDirection="column" paddingX={1} paddingY={0}>
+      <Box flexGrow={1} flexDirection="column" paddingX={1} paddingY={0}>
+        <Text color={theme.dim} bold>
+          output
+        </Text>
+
         <Box flexDirection="column" height={logHeight} overflow="hidden">
           {visibleLines.map((line, i) => (
             <Box key={i}>
@@ -198,7 +201,7 @@ export function RunnerScreen({ theme, profile, llamaServerBin, onExit }: RunnerS
             </Box>
           ))}
         </Box>
-      </ThemedBox>
+      </Box>
 
       {/* Scrollbar indicator */}
       <Box paddingX={1} flexShrink={0}>
