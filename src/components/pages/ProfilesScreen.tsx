@@ -7,7 +7,7 @@ import type {
   LlamaProfile,
   Theme,
 } from "../../types/index";
-import { formatBytes, formatTokens } from "../../utils/llama";
+import { formatBytes } from "../../utils/llama";
 import { petEvents, toast } from "../../utils/petEvents";
 import { AlertBox } from "../ui/AlertBox";
 import { Logo } from "../ui/Logo";
@@ -322,7 +322,7 @@ export function ProfilesScreen({
               <DetailRow
                 theme={theme}
                 label="Context"
-                value={`${formatTokens(selected.contextSize)} tokens`}
+                value={`${selected.contextSize}${selected.contextUnit || ""} tokens`}
               />
               <DetailRow
                 theme={theme}

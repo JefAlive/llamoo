@@ -63,22 +63,20 @@ export function setModels(models: GgufModel[]): void {
   conf.set("models", models);
 }
 
-export function makeDefaultProfile(
-  modelPath: string,
-  modelName: string
-): LlamaProfile {
+export function makeDefaultProfile(modelPath: string): LlamaProfile {
   return {
     id: nanoid(),
-    name: `Profile - ${modelName}`,
+    name: "",
     modelPath,
-    contextSize: 4096,
+    contextSize: 64,
+    contextUnit: "K",
     threads: 4,
     threadsHttp: 4,
     gpuLayers: 0,
     mainGpu: 0,
     tensorSplit: "",
-    kvCacheTypeK: "f16",
-    kvCacheTypeV: "f16",
+    kvCacheTypeK: "q8_0",
+    kvCacheTypeV: "q8_0",
     cacheTypeDraft: "f16",
     flashAttention: false,
     noMmap: false,
@@ -91,10 +89,10 @@ export function makeDefaultProfile(
     frequencyPenalty: 0.0,
     presencePenalty: 0.0,
     draftMin: 0,
-    draftMax: 16,
+    draftMax: 0,
     draftPMin: 0.0,
     host: "127.0.0.1",
-    port: 8080,
+    port: 8000,
     apiKey: "",
     loraPath: "",
     loraScale: 1.0,

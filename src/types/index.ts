@@ -46,6 +46,7 @@ export interface LlamaProfile {
   modelPath: string;
   // Core
   contextSize: number;
+  contextUnit: string;
   threads: number;
   threadsHttp: number;
   // GPU

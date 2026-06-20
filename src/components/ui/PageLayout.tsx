@@ -15,8 +15,9 @@ interface PageLayoutProps {
   hints: HintItem[];
   header?: React.ReactNode; // Equivale ao children 1 (opcional)
   leftColumn: React.ReactNode; // Equivale ao children 2
-  rightColumn: React.ReactNode; // Equivale ao children 3
+  rightColumn?: React.ReactNode; // Equivale ao children 3
   hasBorder?: boolean; // Substitui a lógica antiga do profiles.length
+  middlePercent?: number;
 }
 
 export function PageLayout({
@@ -26,13 +27,15 @@ export function PageLayout({
   leftColumn,
   rightColumn,
   hasBorder = true,
+  middlePercent = 0.6,
 }: PageLayoutProps) {
   const petRef = useRef(null);
-  const { isDesktop, maxContainerColumns } = useResponsiveLayout();
+  const { maxContainerColumns } = useResponsiveLayout();
 
   // Calcula as larguras das colunas baseado no ambiente
-  const leftWidth = Math.floor(maxContainerColumns * (isDesktop ? 0.6 : 0.5));
-  const rightWidth = Math.floor(maxContainerColumns * (isDesktop ? 0.4 : 0.5));
+  middlePercent = rightColumn ? middlePercent : 1;
+  const leftWidth = Math.floor(maxContainerColumns * middlePercent);
+  const rightWidth = Math.floor(maxContainerColumns * (1 - middlePercent));
 
   return (
     <Box

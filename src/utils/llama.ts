@@ -60,7 +60,16 @@ export function buildLlamaArgs(profile: LlamaProfile): string[] {
 
   // Context
   if (profile.contextSize > 0) {
-    args.push("--ctx-size", String(profile.contextSize));
+    const contextUnitSizes: Record<string, number> = {
+      [""]: 1,
+      ["K"]: 1024,
+      ["M"]: 1024 * 1024,
+      ["B"]: 1024 * 1024 * 1024,
+      ["T"]: 1024 * 1024 * 1024 * 1024,
+    };
+    const unitSize = contextUnitSizes[profile.contextUnit];
+    const contextSize = unitSize * profile.contextSize;
+    args.push("--ctx-size", String(contextSize));
   }
 
   // Threads

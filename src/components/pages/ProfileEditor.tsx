@@ -1,7 +1,7 @@
 import { Box, Text, useInput } from "ink";
-import TextInput from "ink-text-input";
 import { useCallback, useState } from "react";
 import type { GgufModel, LlamaProfile, Theme } from "../../types/index";
+import { EditableFormList } from "../ui/EditableFormList";
 import { PageLayout } from "../ui/PageLayout";
 import { SelectableList } from "../ui/SelectableList";
 import { Title } from "../ui/Title";
@@ -34,16 +34,17 @@ type FieldDef =
   | { type: "model"; key: "modelPath"; label: string; desc: string };
 
 const KV_TYPES = [
-  "f32",
-  "f16",
-  "bf16",
-  "q8_0",
+  "iq4_nl",
   "q4_0",
   "q4_1",
-  "iq4_nl",
   "q5_0",
   "q5_1",
+  "q8_0",
+  "bf16",
+  "f16",
+  "f32",
 ];
+const CONTEXT_UNIT_TYPES = ["", "K", "M", "B", "T"];
 const CHAT_TEMPLATES = [
   "",
   "llama3",
@@ -79,7 +80,14 @@ const FIELDS: FieldDef[] = [
     key: "contextSize",
     label: "Context Size",
     desc: "Max context window in tokens (--ctx-size)",
-    step: 512,
+    step: 8,
+  },
+  {
+    type: "select",
+    key: "contextUnit",
+    label: "Context Unit",
+    desc: "Context unit type",
+    options: CONTEXT_UNIT_TYPES,
   },
   {
     type: "number",
@@ -303,9 +311,6 @@ export function ProfileEditor({
   const [modelPickerIdx, setModelPickerIdx] = useState(0);
 
   const currentField = FIELDS[fieldIdx];
-  const VISIBLE = 18;
-  const scrollOffset = Math.max(0, fieldIdx - Math.floor(VISIBLE / 2));
-  const visibleFields = FIELDS.slice(scrollOffset, scrollOffset + VISIBLE);
 
   const getVal = (field: FieldDef): string => {
     const raw = draft[field.key as keyof LlamaProfile];
@@ -433,7 +438,7 @@ export function ProfileEditor({
     return (
       <PageLayout
         theme={theme}
-        hasBorder={true}
+        hasBorder={false}
         leftColumn={
           <Box flexDirection="column">
             <Box marginBottom={1}>
@@ -453,7 +458,6 @@ export function ProfileEditor({
             )}
           </Box>
         }
-        rightColumn={<></>}
         hints={[
           { key: "↑↓", desc: "navigate" },
           { key: "↵", desc: "select" },
@@ -467,48 +471,23 @@ export function ProfileEditor({
     <PageLayout
       theme={theme}
       hasBorder={true}
+      middlePercent={0.7}
       leftColumn={
         <Box flexDirection="column" gap={0}>
           <Box width="100%" marginBottom={1}>
             <Title title="profile editor" theme={theme} />
           </Box>
 
-          {visibleFields.map((field, i) => {
-            const realIdx = i + scrollOffset;
-            const isSelected = realIdx === fieldIdx;
-            const valStr = getVal(field);
-
-            return (
-              <Box key={field.key} gap={1}>
-                <Text
-                  color={isSelected ? theme.accent : theme.fg}
-                  bold={isSelected}
-                >
-                  {isSelected ? "> " : "  "}
-                  {field.label.padEnd(22)}
-                </Text>
-
-                {isSelected &&
-                editing &&
-                field.type !== "bool" &&
-                field.type !== "select" ? (
-                  <Box gap={1}>
-                    <Text color={theme.accent}>[</Text>
-                    <TextInput
-                      value={editVal}
-                      onChange={setEditVal}
-                      focus={true}
-                    />
-                    <Text color={theme.accent}>]</Text>
-                  </Box>
-                ) : (
-                  <Text color={isSelected ? theme.accent : theme.dim}>
-                    {valStr || "—"}
-                  </Text>
-                )}
-              </Box>
-            );
-          })}
+          <EditableFormList
+            fields={FIELDS} // Passe a lista completa de campos aqui (não use o .slice antigo)
+            fieldIdx={fieldIdx} // O índice do campo selecionado no seu estado do pai
+            editing={editing} // Estado booleano se está editando ou não
+            editVal={editVal} // Estado com a string sendo digitada
+            setEditVal={setEditVal} // Função dispatch do useState para atualizar o texto
+            getVal={getVal} // Sua função atual que formata o valor (ex: retorna "—" ou string)
+            theme={theme} // Seu objeto de temas
+            scrollMargin={2} // Margem de segurança para o scroll começar antes de bater no topo/fim
+          />
         </Box>
       }
       rightColumn={
