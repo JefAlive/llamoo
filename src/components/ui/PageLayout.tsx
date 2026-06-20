@@ -45,7 +45,6 @@ export function PageLayout({
         flexDirection="column"
         alignItems="center"
         justifyContent="space-around"
-        position="relative"
         width={maxContainerColumns}
         flexGrow={1}
         paddingY={1}
@@ -59,7 +58,7 @@ export function PageLayout({
           flexDirection="row"
           justifyContent="center"
           alignItems="center"
-          gap={2}
+          gap={3}
           flexShrink={1}
         >
           {/* Coluna Esquerda (children 2) */}
@@ -77,23 +76,46 @@ export function PageLayout({
             flexDirection="column"
             width={rightWidth}
             height="100%"
-            borderStyle={hasBorder ? "round" : undefined}
-            borderColor={theme.border}
-            borderBackgroundColor={theme.bg}
-            paddingX={2}
             paddingY={1}
+            position="relative"
           >
-            {rightColumn}
+            <Box
+              flexDirection="column"
+              borderStyle={
+                hasBorder
+                  ? {
+                      topLeft: "▞",
+                      top: "▀",
+                      topRight: "▚",
+                      right: "▐",
+                      bottomRight: "▞",
+                      bottom: "▄",
+                      bottomLeft: "▚",
+                      left: "▌",
+                    }
+                  : undefined
+              }
+              borderTop={true}
+              borderRight={true}
+              borderBottom={true}
+              borderLeft={true}
+              borderColor={theme.border}
+              borderBackgroundColor={theme.bg}
+              paddingX={1}
+              paddingBottom={1}
+            >
+              {rightColumn}
+            </Box>
 
             <Box
               position="absolute"
-              bottom={-1}
-              right={-4}
+              bottom={0}
+              right={-2}
               width={Math.floor(maxContainerColumns * 0.5)}
               justifyContent="flex-end"
               alignItems="flex-end"
             >
-              <Box justifyContent="flex-end" paddingX={2}>
+              <Box justifyContent="flex-end" paddingLeft={2}>
                 <Pet ref={petRef} theme={theme} />
               </Box>
             </Box>

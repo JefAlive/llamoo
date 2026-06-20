@@ -13,6 +13,7 @@ import { AlertBox } from "../ui/AlertBox";
 import { Logo } from "../ui/Logo";
 import { PageLayout } from "../ui/PageLayout";
 import { SelectableList } from "../ui/SelectableList";
+import { Title } from "../ui/Title";
 
 interface ProfilesScreenProps {
   theme: Theme;
@@ -225,9 +226,7 @@ export function ProfilesScreen({
       leftColumn={
         <Box flexDirection="column" gap={1}>
           <Box flexShrink={0}>
-            <Text color={theme.dim} bold>
-              {"models"}
-            </Text>
+            <Title title="models" theme={theme} />
           </Box>
 
           {models.length === 0 && (
@@ -239,7 +238,8 @@ export function ProfilesScreen({
           )}
 
           {models.length > 0 && (
-            <Box paddingLeft={2}>
+            <Box gap={1}>
+              <Text color={theme.dim}>{`░`}</Text>
               <Text color={theme.fg}>
                 {`${models.length} ${models.length === 1 ? "model" : "models"} detected`}
               </Text>
@@ -247,10 +247,9 @@ export function ProfilesScreen({
           )}
 
           {(models.length > 0 || profiles.length > 0) && (
-            <Box>
-              <Text color={theme.dim} bold>
-                {"profiles"}
-              </Text>
+            <Box marginBottom={1}>
+              <Title title="profiles" theme={theme} />
+
               {(searching || searchQuery) && (
                 <>
                   <Text color={theme.accent} bold={searching}>
@@ -282,8 +281,6 @@ export function ProfilesScreen({
             items={filteredProfiles.map((p) => ({ id: p.id, label: p.name }))}
             selectedIdx={selectedIdx}
             theme={theme}
-            scrollOffset={scrollOffset}
-            listHeight={listHeight}
           />
         </Box>
       }

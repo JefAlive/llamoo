@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import type { GgufModel, LlamaProfile, Theme } from "../../types/index";
 import { PageLayout } from "../ui/PageLayout";
 import { SelectableList } from "../ui/SelectableList";
+import { Title } from "../ui/Title";
 
 interface ProfileEditorProps {
   theme: Theme;
@@ -436,9 +437,7 @@ export function ProfileEditor({
         leftColumn={
           <Box flexDirection="column">
             <Box marginBottom={1}>
-              <Text color={theme.dim} bold>
-                select model
-              </Text>
+              <Title title="select model" theme={theme} />
             </Box>
 
             {models.length === 0 ? (
@@ -471,9 +470,7 @@ export function ProfileEditor({
       leftColumn={
         <Box flexDirection="column" gap={0}>
           <Box width="100%" marginBottom={1}>
-            <Text color={theme.dim} bold>
-              profile editor
-            </Text>
+            <Title title="profile editor" theme={theme} />
           </Box>
 
           {visibleFields.map((field, i) => {

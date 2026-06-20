@@ -5,6 +5,7 @@ import { themes } from "../../themes/index";
 import type { Theme, ThemeName } from "../../types/index";
 import { PageLayout } from "../ui/PageLayout";
 import { SelectableList } from "../ui/SelectableList";
+import { Title } from "../ui/Title";
 
 const THEME_NAMES = Object.keys(themes) as ThemeName[];
 
@@ -42,9 +43,7 @@ export function ThemePicker({
       leftColumn={
         <>
           <Box marginBottom={1}>
-            <Text color={previewTheme.dim} bold>
-              {"themes"}
-            </Text>
+            <Title title="themes" theme={previewTheme} />
           </Box>
 
           <SelectableList

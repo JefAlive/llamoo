@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Theme } from "../../types/index";
 import { PageLayout } from "../ui/PageLayout";
 import { SelectableList } from "../ui/SelectableList";
+import { Title } from "../ui/Title";
 
 interface DirManagerProps {
   theme: Theme;
@@ -67,9 +68,7 @@ export function DirManager({ theme, dirs, onSave, onCancel }: DirManagerProps) {
       leftColumn={
         <Box flexDirection="column" gap={1}>
           <Box width="100%">
-            <Text color={theme.dim} bold>
-              model scan directories
-            </Text>
+            <Title title="model scan directories" theme={theme} />
           </Box>
 
           {list.length === 0 && (
