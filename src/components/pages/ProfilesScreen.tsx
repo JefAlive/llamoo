@@ -208,6 +208,7 @@ export function ProfilesScreen({
       theme={theme}
       hasBorder={profiles.length > 0}
       header={<Logo theme={theme} />}
+      middlePercent={0.5}
       leftColumn={
         <Box flexDirection="column" gap={1}>
           <Box flexShrink={0}>
@@ -326,7 +327,7 @@ export function ProfilesScreen({
               />
               <DetailRow
                 theme={theme}
-                label="KV Cache K/V"
+                label="Cache K/V"
                 value={`${selected.kvCacheTypeK} / ${selected.kvCacheTypeV}`}
               />
               <DetailRow
@@ -336,7 +337,7 @@ export function ProfilesScreen({
               />
               <DetailRow
                 theme={theme}
-                label="Top-K / Top-P"
+                label="Top-K/Top-P"
                 value={`${selected.topK} / ${selected.topP}`}
               />
               <DetailRow
@@ -411,9 +412,17 @@ function DetailRow({
   accent?: boolean;
 }) {
   return (
-    <Box gap={1}>
-      <Text color={theme.dim}>{label.padEnd(14)}</Text>
-      <Text color={accent ? theme.accent : theme.fg}>{value}</Text>
+    <Box flexShrink={0}>
+      <Box flexShrink={0} width={12}>
+        <Text wrap="truncate" color={theme.dim}>
+          {label}
+        </Text>
+      </Box>
+      <Box flexShrink={1} height={1} paddingLeft={1}>
+        <Text wrap="truncate" color={accent ? theme.accent : theme.fg}>
+          {value}
+        </Text>
+      </Box>
     </Box>
   );
 }
