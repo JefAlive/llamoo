@@ -4,10 +4,11 @@
   "description": "My llama says moo. A TUI for running gguf models with llama-server easy way",
   "type": "module",
   "bin": {
-    "lammoo": "./dist/index.js"
+    "llamoo": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "esbuild src/index.tsx --bundle --platform=node --format=esm --packages=external --outfile=dist/index.js",
+    "init": "tsx src/index.tsx",
     "dev": "tsx --watch src/index.tsx",
     "start": "node dist/index.js",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json}\"",
@@ -26,6 +27,7 @@
     "@eslint/js": "^9.17.0",
     "@types/node": "^20.19.43",
     "@types/react": "^19.2.0",
+    "esbuild": "^0.28.1",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",

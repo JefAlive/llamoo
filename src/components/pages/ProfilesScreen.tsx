@@ -199,21 +199,6 @@ export function ProfilesScreen({
         petEvents.on("toastFinished", handleConfigureProfileToastFinished);
       }
 
-      if (models.length > 0 && profiles.length > 0) {
-        const messageId = toast(
-          "Yak!\nUse [e] to edit a profile.\nUse [r] to run a profile."
-        );
-
-        const handleEditProfileToastFinished = (finishedMessageId: string) => {
-          if (finishedMessageId === messageId) {
-            setIsAlertBlinking(true);
-            petEvents.off("toastFinished", handleEditProfileToastFinished);
-          }
-        };
-
-        petEvents.on("toastFinished", handleEditProfileToastFinished);
-      }
-
       setPetLoaded(true);
     }
   }, [petRef]);
