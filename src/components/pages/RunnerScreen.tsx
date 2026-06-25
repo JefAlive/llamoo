@@ -186,32 +186,32 @@ export function RunnerScreen({
         </Box>
         <ProgressBarGauge
           name="RAM"
-          value={80}
-          maxValue={100}
+          value={8.2}
+          maxValue={16}
           unit="G"
           theme={theme}
           type="smooth"
         />
         <ProgressBarGauge
           name="VRAM"
-          value={90}
-          maxValue={100}
+          value={6.5}
+          maxValue={8}
           unit="G"
           theme={theme}
           type="smooth"
         />
         <ProgressBarGauge
           name="CTX"
-          value={93}
-          maxValue={100}
+          value={42}
+          maxValue={128}
           unit="k"
           theme={theme}
           type="smooth"
         />
         <ProgressBarGauge
           name="KV"
-          value={96}
-          maxValue={100}
+          value={2.1}
+          maxValue={8}
           unit="G"
           theme={theme}
           type="smooth"
@@ -238,7 +238,7 @@ export function RunnerScreen({
         </Box>
         <ProgressBarGauge
           name="CPU"
-          value={42}
+          value={5}
           maxValue={100}
           showMaxValue={false}
           unit="%"
@@ -247,7 +247,7 @@ export function RunnerScreen({
         />
         <ProgressBarGauge
           name="GPU"
-          value={91}
+          value={95}
           maxValue={100}
           showMaxValue={false}
           unit="%"
@@ -256,8 +256,8 @@ export function RunnerScreen({
         />
         <ProgressBarGauge
           name="TOK"
-          value={142}
-          maxValue={160}
+          value={32}
+          maxValue={80}
           showMaxValue={false}
           unit="tok/s"
           theme={theme}
@@ -265,8 +265,8 @@ export function RunnerScreen({
         />
         <ProgressBarGauge
           name="TTFT"
-          value={96}
-          maxValue={100}
+          value={0.8}
+          maxValue={1}
           showMaxValue={false}
           unit="s"
           theme={theme}
@@ -352,7 +352,7 @@ export function RunnerScreen({
           </Box>
           <Box flexShrink={1}>
             <Text
-              color={line.isError ? theme.error : theme.fg}
+              color={theme.fg /*line.isError ? theme.error : theme.fg*/}
               wrap="truncate-end"
             >
               {line.text}
