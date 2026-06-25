@@ -1,9 +1,33 @@
 import { ChildProcess, spawn } from "child_process";
-import { Box, Text, useInput, useStdout } from "ink";
+import { Box, Text, useInput } from "ink";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { LlamaProfile, Theme } from "../../types/index";
 import { buildLlamaArgs } from "../../utils/llama";
-import { HintBar } from "../ui/StatusBar";
+import { ProgressBarGauge } from "../ui/ProgressBarGauge";
+import { RunnerLayout } from "../ui/RunnerLayout";
+import { TerminalScrollbar } from "../ui/TerminalScrollbar";
+
+/**
+╭─ resources ──────────────╮╭─ performance ───────────╮╭─ health ───────────────────────────────╮╭─ stastistics ────────╮
+│ RAM  [ ▃▄▅▆   ]  22/32G  ││ CPU  ▰▰▱▱  42%          ││ (•‿•) model fits comfortably           │| ◔ 4d12h uptime       |
+│ VRAM [ ▂▃▄▅▆█ ]  6.1/12G ││ GPU  ▰▰▰▱  81%          ││ (õ_õ) responses slow due to limits     │| $ 18.42 saved        |
+│ CTX  [ ▂▂▃▄▅█ ]  31k/32k ││ TOK  ▰▰▰▱  142/s (fast) ││ (x_x) no more room for chat            │|──────────────────────|
+│ KV   [ ▂▂▃    ]  2.1/8G  ││ TTFT ▰▱▱▱  0.8s (fast)  ││ tip: there is vram for higher ctx size │| model is running ●   |
+╰──────────────────────────╯╰─────────────────────────╯╰────────────────────────────────────────╯╰──────────────────────╯
+
+health messages:
+- fazer um sistema que eu escrevo todas frases de health possíveis num array
+- cada frase tem um priority
+- as top 3 priority exibem no health panel
+
+tips:
+- cada resource/performance/metric eu transformo de número pra algo subjetivo: bom, medio, ruim
+- com base no critério subjetivo:
+  - numa tabela verdade eu faço todas as combinações possíveis entre as métricas
+  - cada combinação vai ter sua tip (dica)
+
+esse vai ser o melhor runner que já vi de LLM
+ */
 
 interface RunnerScreenProps {
   theme: Theme;
@@ -24,86 +48,62 @@ export function RunnerScreen({
   llamaServerBin,
   onExit,
 }: RunnerScreenProps) {
-  const { stdout } = useStdout();
   const [lines, setLines] = useState<LogLine[]>([]);
   const [status, setStatus] = useState<
     "starting" | "running" | "stopped" | "error"
   >("starting");
   const [exitCode, setExitCode] = useState<number | null>(null);
   const procRef = useRef<ChildProcess | null>(null);
+
   const [scrollOffset, setScrollOffset] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
 
-  const termHeight = stdout?.rows ?? 24;
-  const logHeight = Math.max(4, termHeight - 10);
+  // Altura dinâmica calculada pelo BoxMetrics do RunnerLayout
+  const [measuredHeight, setMeasuredHeight] = useState<number>(0);
 
-  const addLine = useCallback(
-    (text: string, isError: boolean) => {
-      const timestamp = new Date().toLocaleTimeString("en-US", {
-        hour12: false,
-      });
-      setLines((prev) => {
-        const next = [...prev, { text, isError, timestamp }];
-        // Cap at 2000 lines
-        return next.length > 2000 ? next.slice(next.length - 2000) : next;
-      });
-      if (autoScroll) {
-        setScrollOffset((prev) => Math.max(0, prev + 1));
-      }
-    },
-    [autoScroll]
-  );
+  const addLine = useCallback((text: string, isError: boolean) => {
+    const timestamp = new Date().toLocaleTimeString("en-US", { hour12: false });
+    setLines((prev) => {
+      const next = [...prev, { text, isError, timestamp }];
+      return next.length > 2000 ? next.slice(next.length - 2000) : next;
+    });
+  }, []);
 
+  // Efeito de controle do Auto-scroll reativo à altura medida
+  useEffect(() => {
+    if (autoScroll && measuredHeight > 0) {
+      setScrollOffset(Math.max(0, lines.length - measuredHeight));
+    }
+  }, [lines.length, autoScroll, measuredHeight]);
+
+  // Código de inicialização do processo (inalterado por segurança)
   useEffect(() => {
     const args = buildLlamaArgs(profile);
     const cmd = llamaServerBin;
-
-    addLine(`Starting: ${cmd} ${args.join(" ")}`, false);
-    addLine(`${"─".repeat(60)}`, false);
 
     try {
       const proc = spawn(cmd, args, {
         stdio: ["ignore", "pipe", "pipe"],
         env: { ...process.env },
       });
-
       procRef.current = proc;
 
       proc.stdout?.on("data", (data: Buffer) => {
-        const text = data.toString();
-        for (const line of text.split("\n")) {
+        for (const line of data.toString().split("\n")) {
           if (line.trim()) addLine(line, false);
         }
       });
 
       proc.stderr?.on("data", (data: Buffer) => {
-        const text = data.toString();
-        for (const line of text.split("\n")) {
+        for (const line of data.toString().split("\n")) {
           if (line.trim()) addLine(line, true);
         }
       });
 
-      proc.on("spawn", () => {
-        setStatus("running");
-        addLine(`Process started (PID ${proc.pid})`, false);
-      });
-
-      proc.on("error", (err) => {
-        setStatus("error");
-        addLine(`ERROR: ${err.message}`, true);
-        if (err.message.includes("ENOENT")) {
-          addLine(
-            `Could not find '${cmd}'. Make sure llama-server is in your PATH.`,
-            true
-          );
-        }
-      });
-
+      proc.on("spawn", () => setStatus("running"));
       proc.on("close", (code) => {
         setStatus(code === 0 ? "stopped" : "error");
         setExitCode(code);
-        addLine(`${"─".repeat(60)}`, false);
-        addLine(`Process exited with code ${code}`, code !== 0);
       });
     } catch (err: any) {
       setStatus("error");
@@ -117,138 +117,249 @@ export function RunnerScreen({
     };
   }, []);
 
+  // Monitoramento de Teclas usando a altura do box dinâmico
   useInput((input, key) => {
     if (input === "q" || key.escape) {
       if (procRef.current && !procRef.current.killed) {
         procRef.current.kill("SIGTERM");
-        addLine("Sent SIGTERM to process...", false);
       } else {
         onExit();
       }
       return;
     }
-    if (input === "Q") {
-      if (procRef.current && !procRef.current.killed) {
-        procRef.current.kill("SIGKILL");
-      }
-      onExit();
-      return;
-    }
+
+    if (measuredHeight <= 0) return;
+
     if (key.upArrow) {
       setAutoScroll(false);
       setScrollOffset((p) => Math.max(0, p - 1));
     } else if (key.downArrow) {
       setScrollOffset((p) => {
-        const maxOffset = Math.max(0, lines.length - logHeight);
+        const maxOffset = Math.max(0, lines.length - measuredHeight);
         const next = Math.min(maxOffset, p + 1);
         if (next >= maxOffset) setAutoScroll(true);
         return next;
       });
     } else if (key.pageUp) {
       setAutoScroll(false);
-      setScrollOffset((p) => Math.max(0, p - Math.floor(logHeight / 2)));
+      setScrollOffset((p) => Math.max(0, p - Math.floor(measuredHeight / 2)));
     } else if (key.pageDown) {
       setScrollOffset((p) => {
-        const maxOffset = Math.max(0, lines.length - logHeight);
-        const next = Math.min(maxOffset, p + Math.floor(logHeight / 2));
+        const maxOffset = Math.max(0, lines.length - measuredHeight);
+        const next = Math.min(maxOffset, p + Math.floor(measuredHeight / 2));
         if (next >= maxOffset) setAutoScroll(true);
         return next;
       });
     } else if (key.end || input === "G") {
       setAutoScroll(true);
-      setScrollOffset(Math.max(0, lines.length - logHeight));
     } else if (key.home || input === "g") {
       setAutoScroll(false);
       setScrollOffset(0);
     }
   });
 
-  // Auto-scroll to bottom when new lines added
-  useEffect(() => {
-    if (autoScroll) {
-      setScrollOffset(Math.max(0, lines.length - logHeight));
-    }
-  }, [lines.length, autoScroll, logHeight]);
+  const visibleLines =
+    measuredHeight > 0
+      ? lines.slice(scrollOffset, scrollOffset + measuredHeight)
+      : lines;
 
-  const statusColor =
-    status === "running"
-      ? theme.success
-      : status === "starting"
-        ? theme.warning
-        : status === "error"
-          ? theme.error
-          : theme.dim;
-
-  const statusLabel =
-    status === "running"
-      ? `● RUNNING  ${profile.host}:${profile.port}`
-      : status === "starting"
-        ? "◌ STARTING..."
-        : status === "error"
-          ? `✗ ERROR (exit ${exitCode})`
-          : `■ STOPPED (exit ${exitCode})`;
-
-  const visibleLines = lines.slice(scrollOffset, scrollOffset + logHeight);
-
-  return (
-    <Box flexDirection="column" flexGrow={1}>
-      {/* Header */}
-      <Box paddingX={1} gap={2} flexShrink={0}>
-        <Text color={theme.accent} bold>
-          RUNNING:
-        </Text>
-        <Text color={theme.fg}>{profile.name}</Text>
-        <Text color={theme.dim}>|</Text>
-        <Text color={statusColor} bold>
-          {statusLabel}
-        </Text>
-        {!autoScroll && (
-          <>
-            <Text color={theme.dim}>|</Text>
-            <Text color={theme.warning}>SCROLLED (G=bottom)</Text>
-          </>
-        )}
+  // Render do Bloco de Stats do Topo (Simulação estática inicial - personalize como preferir)
+  const statsBarElement = (
+    <Box width="100%" flexShrink={0}>
+      <Box
+        flexDirection="column"
+        borderStyle="round"
+        borderColor={theme.dim}
+        borderBackgroundColor={theme.bg}
+        height={6}
+        paddingX={1}
+        position="relative"
+      >
+        <Box
+          position="absolute"
+          top={-1}
+          left={0}
+          paddingX={1}
+          backgroundColor={theme.bg}
+        >
+          <Text color={theme.dim}>resources</Text>
+        </Box>
+        <ProgressBarGauge
+          name="RAM"
+          value={80}
+          maxValue={100}
+          unit="G"
+          theme={theme}
+          type="smooth"
+        />
+        <ProgressBarGauge
+          name="VRAM"
+          value={90}
+          maxValue={100}
+          unit="G"
+          theme={theme}
+          type="smooth"
+        />
+        <ProgressBarGauge
+          name="CTX"
+          value={93}
+          maxValue={100}
+          unit="k"
+          theme={theme}
+          type="smooth"
+        />
+        <ProgressBarGauge
+          name="KV"
+          value={96}
+          maxValue={100}
+          unit="G"
+          theme={theme}
+          type="smooth"
+        />
       </Box>
-
-      {/* Log area */}
-      <Box flexGrow={1} flexDirection="column" paddingX={1} paddingY={0}>
-        <Text color={theme.dim} bold>
-          output
-        </Text>
-
-        <Box flexDirection="column" height={logHeight} overflow="hidden">
-          {visibleLines.map((line, i) => (
-            <Box key={i}>
-              <Text color={theme.dim}>{line.timestamp} </Text>
-              <Text
-                color={line.isError ? theme.error : theme.fg}
-                wrap="truncate"
-              >
-                {line.text}
-              </Text>
-            </Box>
-          ))}
+      <Box
+        flexDirection="column"
+        borderStyle="round"
+        borderColor={theme.dim}
+        borderBackgroundColor={theme.bg}
+        height={6}
+        flexGrow={1}
+        paddingX={1}
+        position="relative"
+      >
+        <Box
+          position="absolute"
+          top={-1}
+          left={0}
+          paddingX={1}
+          backgroundColor={theme.bg}
+        >
+          <Text color={theme.dim}>performance</Text>
+        </Box>
+        <ProgressBarGauge
+          name="CPU"
+          value={42}
+          maxValue={100}
+          showMaxValue={false}
+          unit="%"
+          theme={theme}
+          type="blocks"
+        />
+        <ProgressBarGauge
+          name="GPU"
+          value={91}
+          maxValue={100}
+          showMaxValue={false}
+          unit="%"
+          theme={theme}
+          type="blocks"
+        />
+        <ProgressBarGauge
+          name="TOK"
+          value={142}
+          maxValue={160}
+          showMaxValue={false}
+          unit="tok/s"
+          theme={theme}
+          type="blocks"
+        />
+        <ProgressBarGauge
+          name="TTFT"
+          value={96}
+          maxValue={100}
+          showMaxValue={false}
+          unit="s"
+          theme={theme}
+          type="blocks"
+        />
+      </Box>
+      <Box
+        flexDirection="column"
+        borderStyle="round"
+        borderColor={theme.dim}
+        borderBackgroundColor={theme.bg}
+        height={6}
+        position="relative"
+      >
+        <Box
+          position="absolute"
+          top={-1}
+          left={0}
+          paddingX={1}
+          backgroundColor={theme.bg}
+        >
+          <Text color={theme.dim}>stats</Text>
+        </Box>
+        <Box paddingX={1}>
+          <Text color={theme.fg}>◔ 4d12h uptime</Text>
+        </Box>
+        <Box paddingX={1}>
+          <Text color={theme.fg}>$ 18.42 saved</Text>
+        </Box>
+        <Box
+          borderColor={theme.dim}
+          borderBackgroundColor={theme.bg}
+          borderStyle="single"
+          height={2}
+          borderTop={true}
+          borderBottom={false}
+          borderRight={false}
+          borderLeft={false}
+          paddingX={1}
+        >
+          <Text
+            color={
+              {
+                starting: theme.fg,
+                running: theme.success,
+                stopped: theme.warning,
+                error: theme.error,
+              }[status]
+            }
+          >
+            model {status} ●
+          </Text>
         </Box>
       </Box>
-
-      {/* Scrollbar indicator */}
-      <Box paddingX={1} flexShrink={0}>
-        <Text color={theme.dim}>
-          {lines.length > 0
-            ? `Lines ${scrollOffset + 1}–${Math.min(scrollOffset + logHeight, lines.length)} of ${lines.length}`
-            : "No output yet"}
-        </Text>
-      </Box>
-
-      <HintBar
-        theme={theme}
-        hints={[
-          { key: "↑↓/PgUp/PgDn", desc: "scroll" },
-          { key: "G/g", desc: "bottom/top" },
-          { key: "q/ESC", desc: "stop (SIGTERM)" },
-          { key: "Q", desc: "force kill" },
-        ]}
-      />
     </Box>
+  );
+
+  return (
+    <RunnerLayout
+      theme={theme}
+      statsElement={statsBarElement}
+      onHeightMeasured={setMeasuredHeight}
+      hints={[
+        { key: "↑↓/PgUp/PgDn", desc: "scroll" },
+        { key: "G/g", desc: "bottom/top" },
+        { key: "q/ESC", desc: "stop" },
+      ]}
+      scrollbar={
+        <TerminalScrollbar
+          totalItems={lines.length}
+          visibleCount={measuredHeight}
+          offset={scrollOffset}
+          height={measuredHeight}
+          theme={theme}
+        />
+      }
+    >
+      {/* Corpo central: Render de linhas puras limitadas a altura do container */}
+      {visibleLines.map((line, i) => (
+        <Box key={i} height={1}>
+          <Box flexShrink={0}>
+            <Text color={theme.dim}>{line.timestamp} </Text>
+          </Box>
+          <Box flexShrink={1}>
+            <Text
+              color={line.isError ? theme.error : theme.fg}
+              wrap="truncate-end"
+            >
+              {line.text}
+            </Text>
+          </Box>
+        </Box>
+      ))}
+    </RunnerLayout>
   );
 }
