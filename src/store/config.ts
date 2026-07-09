@@ -63,10 +63,13 @@ export function setModels(models: GgufModel[]): void {
   conf.set("models", models);
 }
 
-export function makeDefaultProfile(modelPath: string): LlamaProfile {
+export function makeDefaultProfile(
+  modelPath: string,
+  name?: string
+): LlamaProfile {
   return {
     id: nanoid(),
-    name: "",
+    name: name ?? "",
     modelPath,
     contextSize: 64,
     contextUnit: "K",
@@ -98,6 +101,6 @@ export function makeDefaultProfile(modelPath: string): LlamaProfile {
     loraScale: 1.0,
     systemPrompt: "",
     chatTemplate: "",
-    customFlags: "",
+    customFlags: "--metrics",
   };
 }
