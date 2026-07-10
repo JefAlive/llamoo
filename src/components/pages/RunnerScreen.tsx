@@ -1,6 +1,7 @@
 import { ChildProcess, spawn } from "child_process";
 import { Box, Text, useInput } from "ink";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useServerMetrics } from "../../hooks/useServerMetrics";
 import type { LlamaProfile, Theme } from "../../types/index";
 import { buildLlamaArgs } from "../../utils/llama";
 import { ProgressBarGauge } from "../ui/ProgressBarGauge";
@@ -48,10 +49,16 @@ export function RunnerScreen({
   llamaServerBin,
   onExit,
 }: RunnerScreenProps) {
+  const { metrics } = useServerMetrics(
+    profile.host,
+    profile.port,
+    profile.apiKey
+  );
   const [lines, setLines] = useState<LogLine[]>([]);
   const [status, setStatus] = useState<
     "starting" | "running" | "stopped" | "error"
   >("starting");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [exitCode, setExitCode] = useState<number | null>(null);
   const procRef = useRef<ChildProcess | null>(null);
 
@@ -163,7 +170,7 @@ export function RunnerScreen({
       ? lines.slice(scrollOffset, scrollOffset + measuredHeight)
       : lines;
 
-  // Render do Bloco de Stats do Topo (Simulação estática inicial - personalize como preferir)
+  // Render do Bloco de Stats do Topo
   const statsBarElement = (
     <Box width="100%" flexShrink={0}>
       <Box
@@ -184,34 +191,38 @@ export function RunnerScreen({
         >
           <Text color={theme.dim}>resources</Text>
         </Box>
+        {/* RAM maps to memory.used/memory.total from server metrics */}
         <ProgressBarGauge
           name="RAM"
-          value={8.2}
-          maxValue={16}
+          value={metrics.ram ?? 0}
+          maxValue={metrics.ramMax || 16}
           unit="G"
           theme={theme}
           type="smooth"
         />
+        {/* VRAM maps to cuda.used/cuda.available from server metrics */}
         <ProgressBarGauge
           name="VRAM"
-          value={6.5}
-          maxValue={8}
+          value={metrics.vram ?? 0}
+          maxValue={metrics.vramMax || 12}
           unit="G"
           theme={theme}
           type="smooth"
         />
+        {/* CTX maps to ctxSize from server metrics (in K-tokens) */}
         <ProgressBarGauge
           name="CTX"
-          value={42}
-          maxValue={128}
+          value={metrics.ctxUsed ?? 0}
+          maxValue={metrics.ctxMax || 128}
           unit="k"
           theme={theme}
           type="smooth"
         />
+        {/* KV maps to kvCache from server metrics (estimated) */}
         <ProgressBarGauge
           name="KV"
-          value={2.1}
-          maxValue={8}
+          value={metrics.kvUsed ?? 0}
+          maxValue={metrics.kvMax || 8}
           unit="G"
           theme={theme}
           type="smooth"
@@ -236,37 +247,41 @@ export function RunnerScreen({
         >
           <Text color={theme.dim}>performance</Text>
         </Box>
+        {/* CPU maps to cpu.user from server metrics */}
         <ProgressBarGauge
           name="CPU"
-          value={5}
+          value={metrics.cpu ?? 0}
           maxValue={100}
           showMaxValue={false}
           unit="%"
           theme={theme}
           type="blocks"
         />
+        {/* GPU maps to aggregate GPU cpu stats from server metrics */}
         <ProgressBarGauge
           name="GPU"
-          value={95}
+          value={metrics.gpu ?? 0}
           maxValue={100}
           showMaxValue={false}
           unit="%"
           theme={theme}
           type="blocks"
         />
+        {/* TOK maps to usage.tokensPerSecond from server metrics */}
         <ProgressBarGauge
           name="TOK"
-          value={32}
-          maxValue={80}
+          value={Math.round(metrics.tok ?? 0)}
+          maxValue={100}
           showMaxValue={false}
           unit="tok/s"
           theme={theme}
           type="blocks"
         />
+        {/* TTFT maps to usage.latency from server metrics (in seconds) */}
         <ProgressBarGauge
           name="TTFT"
-          value={0.8}
-          maxValue={1}
+          value={metrics.ttft ?? 0}
+          maxValue={5}
           showMaxValue={false}
           unit="s"
           theme={theme}
